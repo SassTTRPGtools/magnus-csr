@@ -106,79 +106,85 @@
             </div>
           </div>
 
-          <!-- 回復滾動 -->
+          <!-- 恢復骰與傷害軌合併區塊 -->
           <div class="character-section mb-6">
-            <div class="border-2 border-black bg-white p-4">
-              <div class="text-xs font-bold uppercase tracking-wide mb-3">恢復骰</div>
-              <div class="space-y-2 text-sm">
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2">
-                  <span>動作</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2">
-                  <span>10 分鐘</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2">
-                  <span>1 小時</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2">
-                  <span>10 小時</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- 傷害軌 -->
-          <div class="character-section mb-6">
-            <div class="border-2 border-black bg-white p-4 relative">
-              <div class="text-xs font-bold uppercase tracking-wide mb-3">傷害軌</div>
-              <div class="space-y-2 text-sm">
-                <label class="flex items-center">
-                  <input type="radio" v-model="character.damageTrack" value="hale" class="mr-2">
-                  <span class="font-bold">強健</span>
-                </label>
-                <div class="flex items-center my-2">
-                  <div class="w-8 h-0.5 bg-gray-400 mx-2"></div>
+            <div class="border-2 border-black bg-white p-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              <!-- 恢復骰（左側） -->
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wide mb-3">恢復骰</div>
+                <div class="space-y-2 text-sm mb-2">
                   <label class="flex items-center">
-                    <input type="radio" v-model="character.damageTrack" value="hurt" class="mr-1">
-                    <span class="text-xs font-bold text-red-700">輕傷—僅部分角色可用</span>
+                    <span class="mr-2">1D6 +</span>
+                    <input type="number" v-model.number="character.recoveryBonus" class="w-16 border-b border-black bg-transparent text-center font-typewriter focus:outline-none mr-2">
                   </label>
                 </div>
-                <label class="flex items-center">
-                  <input type="radio" v-model="character.damageTrack" value="impaired" class="mr-2">
-                  <span class="font-bold text-red-600">帶傷</span>
-                </label>
-                <div class="ml-6 text-xs text-gray-600">
-                  <div>• 應用努力的成本 +1</div>
-                  <div>• 弱效/強效影響無效</div>
-                  <div>• 戰鬥時特殊骰面只會 +1</div>
-                  <div>• +1傷害</div>
+                <div class="space-y-2 text-sm">
+                  <label class="flex items-center">
+                    <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2">
+                    <span>動作</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2">
+                    <span>10 分鐘</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2">
+                    <span>1 小時</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2">
+                    <span>10 小時</span>
+                  </label>
                 </div>
-                <label class="flex items-center">
-                  <input type="radio" v-model="character.damageTrack" value="debilitated" class="mr-2">
-                  <span class="font-bold text-red-800">重創</span>
-                </label>
-                <div class="ml-6 text-xs text-gray-600">
-                  <div>• 只能移動鄰近距離（通常是爬行）</div>
-                  <div>• 速度池為0則無法移動</div>
-                </div>
-                <label class="flex items-center">
-                  <input type="radio" v-model="character.damageTrack" value="dead" class="mr-2">
-                  <span class="font-bold text-black">死亡</span>
-                </label>
               </div>
-              <!-- 血跡裝飾 -->
-              <div class="absolute top-2 right-2 w-8 h-8 bg-red-600 rounded-full opacity-30 transform rotate-12"></div>
+              <!-- 傷害軌（右側） -->
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wide mb-3">傷害軌</div>
+                <div class="space-y-2 text-sm">
+                  <label class="flex items-center">
+                    <input type="radio" v-model="character.damageTrack" value="hale" class="mr-2">
+                    <span class="font-bold">強健</span>
+                  </label>
+                  <!-- 連結線與輕傷 -->
+                  <div class="flex items-center my-2">
+                    <div class="w-8 h-0.5 bg-gray-400 mx-2"></div>
+                    <label class="flex items-center">
+                      <input type="radio" v-model="character.damageTrack" value="hurt" class="mr-1">
+                      <span class="text-xs font-bold text-red-700">輕傷</span>
+                    </label>
+                    <div class="w-8 h-0.5 bg-gray-400 mx-2"></div>
+                  </div>
+                  <div class="text-xs text-gray-500 ml-8 mb-2">僅部分角色可用</div>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="character.damageTrack" value="impaired" class="mr-2">
+                    <span class="font-bold text-red-600">帶傷</span>
+                  </label>
+                  <div class="ml-6 text-xs text-gray-600">
+                    <div>• 應用努力的成本 +1</div>
+                    <div>• 弱效/強效影響無效</div>
+                    <div>• 戰鬥時特殊骰面只會 +1</div>
+                  </div>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="character.damageTrack" value="debilitated" class="mr-2">
+                    <span class="font-bold text-red-800">重創</span>
+                  </label>
+                  <div class="ml-6 text-xs text-gray-600">
+                    <div>• 只能移動鄰近距離（通常是爬行）</div>
+                    <div>• 如果速度池為0則無法移動</div>
+                  </div>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="character.damageTrack" value="dead" class="mr-2">
+                    <span class="font-bold text-black">死亡</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- 進階 -->
           <div class="character-section">
             <div class="border-2 border-black bg-white p-4">
-              <div class="text-xs font-bold uppercase tracking-wide mb-3">晉升位階</div>
+              <div class="text-xs font-bold uppercase tracking-wide mb-3">晉升位階（完成任意四項）</div>
               <div class="text-xs space-y-1">
                 <label class="flex items-center">
                   <input type="checkbox" class="mr-2">
@@ -343,7 +349,8 @@ const character = ref({
   cyphers: '',
   abilities: '',
   xp: 0,
-  background: ''
+  background: '',
+  recoveryBonus: 0
 })
 
 const saveCharacter = () => {
@@ -375,7 +382,8 @@ const clearForm = () => {
       cyphers: '',
       abilities: '',
       xp: 0,
-      background: ''
+      background: '',
+      recoveryBonus: 0
     }
   }
 }
