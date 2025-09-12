@@ -323,6 +323,33 @@
               </div>
             </div>
           </div>
+
+          <!-- 角色資料管理 -->
+          <div class="character-section">
+            <div class="border-2 border-black bg-white p-4">
+              <div class="text-xs font-bold uppercase tracking-wide mb-3">角色資料管理</div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <!-- 第一行 -->
+                <button @click="exportToJSON" 
+                        class="px-3 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded font-typewriter">
+                  匯出 JSON
+                </button>
+                <label class="px-3 py-2 bg-orange-600 text-white hover:bg-orange-700 rounded font-typewriter cursor-pointer text-center">
+                  匯入 JSON
+                  <input type="file" @change="importFromJSON" accept=".json" class="hidden">
+                </label>
+                <!-- 第二行 -->
+                <button @click="exportToText" 
+                        class="px-3 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded font-typewriter">
+                  複製純文字版本
+                </button>
+                <button @click="clearForm" 
+                        class="px-3 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-typewriter">
+                  清空資料
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 中欄 - 標題、技能與攻擊 -->
@@ -345,7 +372,7 @@
             <div class="border-2 border-black bg-white p-4">
               <div class="text-sm font-bold uppercase tracking-wide mb-4">攻擊</div>
                 <div v-for="n in 4" :key="n" class="flex items-center border-b border-gray-300 pb-1">
-                  <input type="text" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
+                  <input type="text" v-model="character.attacks[n-1]" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
                 </div>
             </div>
           </div>
@@ -357,7 +384,7 @@
               </div>
               <div class="space-y-1">
                 <div v-for="n in 15" :key="n" class="flex items-center border-b border-gray-300 pb-1">
-                  <input type="text" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
+                  <input type="text" v-model="character.skills[n-1]" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
                 </div>
               </div>
             </div>
@@ -497,7 +524,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 
 const character = ref({
   name: '',
@@ -533,6 +560,8 @@ const character = ref({
   stressLevel: 0,
   supernaturalStressMarks: Array(10).fill(false),
   equipment: '',
+  attacks: Array(4).fill(''),
+  skills: Array(15).fill(''),
   cyphers: [],
   cypherLimit: 0,
   abilities: [],
@@ -711,6 +740,9 @@ const getAbilityPreview = (content) => {
 
 // 隱藏原生 title 工具提示
 onMounted(() => {
+  // 頁面載入時自動載入儲存的資料
+  loadFromLocalStorage()
+  
   const elementsWithTitle = document.querySelectorAll('[title]')
   elementsWithTitle.forEach(element => {
     const originalTitle = element.getAttribute('title')
@@ -732,13 +764,20 @@ onMounted(() => {
   })
 })
 
+// 監聽角色資料變化，自動儲存到 localStorage
+watch(character, () => {
+  nextTick(() => {
+    saveToLocalStorage()
+  })
+}, { deep: true })
+
 const saveCharacter = () => {
   console.log('角色資料:', character.value)
   alert('角色已儲存！（目前只儲存在瀏覽器 console）')
 }
 
 const clearForm = () => {
-  if (confirm('確定要清除所有資料嗎？')) {
+  if (confirm('確定要清除所有資料嗎？這將建立全新角色，無法復原。')) {
     character.value = {
       name: '',
       type: '',
@@ -759,8 +798,10 @@ const clearForm = () => {
       sanityTrack: 'calm',
       currentStress: 0,
       stressLevel: 0,
-  supernaturalStressMarks: Array(10).fill(false),
+      supernaturalStressMarks: Array(10).fill(false),
       equipment: '',
+      attacks: Array(4).fill(''),
+      skills: Array(15).fill(''),
       cyphers: [],
       cypherLimit: 0,
       abilities: [],
@@ -768,7 +809,237 @@ const clearForm = () => {
       background: '',
       recoveryBonus: 0
     }
+    showCopySuccess('所有資料已清空，可以建立新角色了！')
   }
+}
+
+// 角色資料管理功能
+const saveToLocalStorage = () => {
+  try {
+    const characterData = JSON.stringify(character.value)
+    localStorage.setItem('magnus-csr-character', characterData)
+  } catch (error) {
+    console.error('自動儲存失敗:', error)
+  }
+}
+
+const loadFromLocalStorage = () => {
+  try {
+    const savedData = localStorage.getItem('magnus-csr-character')
+    if (savedData) {
+      const parsedData = JSON.parse(savedData)
+      // 確保所有必要的屬性都存在，並補充預設值
+      character.value = {
+        name: '',
+        type: '',
+        descriptor: '',
+        focus: '',
+        tier: 1,
+        effort: 1,
+        might: { pool: 0, edge: 0, current: 0 },
+        speed: { pool: 0, edge: 0, current: 0 },
+        intellect: { pool: 0, edge: 0, current: 0 },
+        recoveryRolls: {
+          action: false,
+          tenMin: false,
+          oneHour: false,
+          tenHours: false
+        },
+        damageTrack: 'hale',
+        sanityTrack: 'calm',
+        currentStress: 0,
+        stressLevel: 0,
+        supernaturalStressMarks: Array(10).fill(false),
+        equipment: '',
+        attacks: Array(4).fill(''),
+        skills: Array(15).fill(''),
+        cyphers: [],
+        cypherLimit: 0,
+        abilities: [],
+        xp: 0,
+        background: '',
+        recoveryBonus: 0,
+        ...parsedData // 覆蓋已儲存的資料
+      }
+      
+      // 確保陣列長度正確
+      if (!character.value.attacks || character.value.attacks.length !== 4) {
+        character.value.attacks = Array(4).fill('').map((_, i) => character.value.attacks?.[i] || '')
+      }
+      if (!character.value.skills || character.value.skills.length !== 15) {
+        character.value.skills = Array(15).fill('').map((_, i) => character.value.skills?.[i] || '')
+      }
+      if (!character.value.supernaturalStressMarks || character.value.supernaturalStressMarks.length !== 10) {
+        character.value.supernaturalStressMarks = Array(10).fill(false).map((_, i) => character.value.supernaturalStressMarks?.[i] || false)
+      }
+    }
+  } catch (error) {
+    console.error('自動載入失敗:', error)
+  }
+}
+
+const exportToJSON = () => {
+  try {
+    const characterData = JSON.stringify(character.value, null, 2)
+    const blob = new Blob([characterData], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${character.value.name || 'magnus-character'}-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    
+    showCopySuccess('JSON 檔案已下載！')
+  } catch (error) {
+    console.error('匯出失敗:', error)
+    showCopySuccess('匯出失敗，請重試')
+  }
+}
+
+const importFromJSON = (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const importedData = JSON.parse(e.target.result)
+      if (confirm('確定要匯入這個角色資料嗎？這將覆蓋目前的資料。')) {
+        character.value = {
+          ...character.value,
+          ...importedData
+        }
+        // 確保陣列長度正確
+        if (!character.value.attacks || character.value.attacks.length !== 4) {
+          character.value.attacks = Array(4).fill('').map((_, i) => importedData.attacks?.[i] || '')
+        }
+        if (!character.value.skills || character.value.skills.length !== 15) {
+          character.value.skills = Array(15).fill('').map((_, i) => importedData.skills?.[i] || '')
+        }
+        if (!character.value.supernaturalStressMarks || character.value.supernaturalStressMarks.length !== 10) {
+          character.value.supernaturalStressMarks = Array(10).fill(false).map((_, i) => importedData.supernaturalStressMarks?.[i] || false)
+        }
+        showCopySuccess('角色資料匯入成功！')
+        // 自動儲存會由 watch 觸發
+      }
+    } catch (error) {
+      console.error('匯入失敗:', error)
+      showCopySuccess('匯入失敗，請檢查檔案格式')
+    }
+  }
+  reader.readAsText(file)
+  
+  // 清除 input 值，允許重複選擇同一檔案
+  event.target.value = ''
+}
+
+const exportToText = async () => {
+  try {
+    // 過濾非空的攻擊和技能
+    const nonEmptyAttacks = character.value.attacks.filter(attack => attack.trim())
+    const nonEmptySkills = character.value.skills.filter(skill => skill.trim())
+    
+    let textContent = `THE MAGNUS ARCHIVES - 角色卡
+==========================================
+
+【基本資訊】
+姓名：${character.value.name || '(未設定)'}
+角色句子：${character.value.focus || '(未設定)'}
+
+【屬性數值】
+位階：${character.value.tier}　努力：${character.value.effort}　XP：${character.value.xp}
+
+氣力　池：${character.value.might.pool}　節省值：${character.value.might.edge}　目前：${character.value.might.current}
+速度　池：${character.value.speed.pool}　節省值：${character.value.speed.edge}　目前：${character.value.speed.current}
+智力　池：${character.value.intellect.pool}　節省值：${character.value.intellect.edge}　目前：${character.value.intellect.current}
+
+【恢復骰】1d6+${character.value.recoveryBonus}
+動作：${character.value.recoveryRolls.action ? '✓' : '○'}　10分鐘：${character.value.recoveryRolls.tenMin ? '✓' : '○'}　1小時：${character.value.recoveryRolls.oneHour ? '✓' : '○'}　10小時：${character.value.recoveryRolls.tenHours ? '✓' : '○'}
+
+【狀態軌】
+傷害軌：${getTrackDisplayName(character.value.damageTrack, 'damage')}
+理智軌：${getTrackDisplayName(character.value.sanityTrack, 'sanity')}
+壓力：${character.value.currentStress}　壓力量級：${character.value.stressLevel}
+超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10
+
+【攻擊】
+${nonEmptyAttacks.length > 0 ? 
+  nonEmptyAttacks.map((attack, index) => `${index + 1}. ${attack}`).join('\n') : 
+  '(無攻擊記錄)'}
+
+【技能】
+${nonEmptySkills.length > 0 ? 
+  nonEmptySkills.map((skill, index) => `${index + 1}. ${skill}`).join('\n') : 
+  '(無技能記錄)'}
+
+【密鑰】(上限：${character.value.cypherLimit})
+${character.value.cyphers.length > 0 ? 
+  character.value.cyphers.map((cypher, index) => 
+    `${index + 1}. ${cypher.title} (等級：${cypher.level})\n   ${cypher.content.replace(/\n/g, '\n   ')}`
+  ).join('\n\n') : '(無密鑰)'}
+
+【能力】
+${character.value.abilities.length > 0 ? 
+  character.value.abilities.map((ability, index) => 
+    `${index + 1}. ${ability.content.replace(/\n/g, '\n   ')}`
+  ).join('\n\n') : '(無能力)'}
+
+【裝備】
+${character.value.equipment || '(無裝備記錄)'}
+
+==========================================
+匯出時間：${new Date().toLocaleString('zh-TW')}
+`
+
+    // 複製到剪貼簿
+    try {
+      await navigator.clipboard.writeText(textContent)
+      showCopySuccess('角色卡純文字版本已複製到剪貼簿！')
+    } catch (error) {
+      console.error('複製失敗:', error)
+      // 備用方案：創建臨時文字區域
+      const textArea = document.createElement('textarea')
+      textArea.value = textContent
+      document.body.appendChild(textArea)
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        showCopySuccess('角色卡純文字版本已複製到剪貼簿！')
+      } catch (fallbackError) {
+        showCopySuccess('複製失敗，請重試')
+      }
+      document.body.removeChild(textArea)
+    }
+  } catch (error) {
+    console.error('匯出失敗:', error)
+    showCopySuccess('匯出失敗，請重試')
+  }
+}
+
+// 輔助函數：獲取軌道狀態的顯示名稱
+const getTrackDisplayName = (value, type) => {
+  const tracks = {
+    damage: {
+      'hale': '強健',
+      'hurt': '輕傷',
+      'impaired': '帶傷',
+      'debilitated': '重創',
+      'dead': '死亡'
+    },
+    sanity: {
+      'calm': '平靜',
+      'uneasy': '不安',
+      'shaken': '動搖',
+      'neurotic': '神經質',
+      'irrational': '不理性',
+      'insane': '精神錯亂',
+      'breakdown': '完全崩潰'
+    }
+  }
+  return tracks[type][value] || value
 }
 </script>
 
