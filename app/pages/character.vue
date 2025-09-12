@@ -1,6 +1,12 @@
 <template>
   <div class="min-h-screen bg-magnus-bg p-4">
     <div class="max-w-7xl mx-auto">
+      <!-- 複製成功提示 -->
+      <div v-if="showCopyNotification" 
+           class="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 font-typewriter text-sm animate-bounce">
+        {{ copyNotificationText }}
+      </div>
+      
       <!-- 三欄式佈局 - 標題夾在中間 -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -361,7 +367,7 @@
           <div class="character-section">
             <div class="border-2 border-black bg-white p-4">
               <div class="text-center text-sm font-bold uppercase tracking-wide mb-4">裝備</div>
-              <textarea v-model="character.abilities" 
+              <textarea v-model="character.equipment" 
                         class="w-full h-80 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
                         placeholder="記錄裝備..."></textarea>
             </div>
@@ -435,12 +441,53 @@
           </div>
 
           <!-- 能力 -->
-          <div class="character-section h-full">
-            <div class="border-2 border-black bg-white p-4 h-full">
-              <div class="text-center text-sm font-bold uppercase tracking-wide mb-4">能力</div>
-              <textarea v-model="character.abilities" 
-                        class="w-full h-full bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
-                        placeholder="記錄角色的特殊能力..."></textarea>
+          <div class="character-section">
+            <div class="border-2 border-black bg-white p-4 h-96 flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-center text-sm font-bold uppercase tracking-wide">能力</div>
+                <button @click="addNewAbility" 
+                        class="text-xs px-2 py-1 bg-green-700 text-white hover:bg-green-800 rounded font-typewriter">
+                  + 添加能力
+                </button>
+              </div>
+              
+              <!-- 能力列表 -->
+              <div class="space-y-2 flex-1 overflow-y-auto">
+                <div v-for="(ability, index) in character.abilities" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
+                  <div class="flex items-center justify-between mb-2">
+                    <button @click="ability.collapsed = !ability.collapsed" 
+                            class="flex items-center text-sm font-medium text-gray-700 hover:text-black flex-1 text-left">
+                      <span class="mr-2">{{ ability.collapsed ? '▶' : '▼' }}</span>
+                      <span>{{ getAbilityTitle(ability.content) || `能力 ${index + 1}` }}</span>
+                    </button>
+                    <div class="flex items-center space-x-1">
+                      <button @click="copyAbilityToClipboard(ability)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製能力詳細內容">
+                        📋
+                      </button>
+                      <button @click="removeAbility(index)" class="text-red-600 hover:text-red-800 text-xs">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div v-if="!ability.collapsed">
+                    <textarea v-model="ability.content" 
+                             placeholder="描述能力的效果、成本和限制..." 
+                             class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
+                             rows="4"></textarea>
+                  </div>
+                  
+                  <!-- 摺疊時顯示預覽 -->
+                  <div v-else-if="ability.content" class="text-xs text-gray-600 italic truncate">
+                    {{ getAbilityPreview(ability.content) }}
+                  </div>
+                </div>
+                
+                <!-- 無能力時的提示 -->
+                <div v-if="character.abilities.length === 0" class="text-center text-gray-500 text-sm py-4">
+                  尚未添加任何能力
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -488,11 +535,24 @@ const character = ref({
   equipment: '',
   cyphers: [],
   cypherLimit: 0,
-  abilities: '',
+  abilities: [],
   xp: 0,
   background: '',
   recoveryBonus: 0
 })
+
+// 複製提示狀態
+const showCopyNotification = ref(false)
+const copyNotificationText = ref('')
+
+// 顯示複製成功提示
+const showCopySuccess = (text) => {
+  copyNotificationText.value = text
+  showCopyNotification.value = true
+  setTimeout(() => {
+    showCopyNotification.value = false
+  }, 2000) // 2秒後隱藏
+}
 
 // 密鑰管理
 const addNewCypher = () => {
@@ -521,7 +581,7 @@ ${cypher.content}`
   
   try {
     await navigator.clipboard.writeText(cypherText)
-    alert('密鑰內容已複製到剪貼簿！')
+    showCopySuccess('密鑰內容已複製！')
   } catch (error) {
     console.error('複製失敗:', error)
     // 備用方案：創建臨時文字區域
@@ -531,7 +591,7 @@ ${cypher.content}`
     textArea.select()
     try {
       document.execCommand('copy')
-      alert('密鑰內容已複製到剪貼簿！')
+      showCopySuccess('密鑰內容已複製！')
     } catch (fallbackError) {
       alert('複製失敗，請手動複製內容')
     }
@@ -542,7 +602,7 @@ ${cypher.content}`
 const generateRandomCyphers = async () => {
   const limit = character.value.cypherLimit || 0
   if (limit <= 0) {
-    alert('請先設定密鑰上限')
+    showCopySuccess('請先設定密鑰上限')
     return
   }
   
@@ -573,11 +633,80 @@ const generateRandomCyphers = async () => {
       })
     }
     
-    alert(`成功生成 ${limit} 個隨機密鑰！`)
+    showCopySuccess(`成功生成 ${limit} 個隨機密鑰！`)
   } catch (error) {
     console.error('載入密鑰資料失敗:', error)
-    alert('載入密鑰資料失敗，請檢查檔案是否存在')
+    showCopySuccess('載入密鑰資料失敗，請檢查檔案是否存在')
   }
+}
+
+// 能力管理
+const addNewAbility = () => {
+  character.value.abilities.push({
+    content: '',
+    collapsed: false
+  })
+}
+
+const removeAbility = (index) => {
+  character.value.abilities.splice(index, 1)
+}
+
+const copyAbilityToClipboard = async (ability) => {
+  const abilityText = `${ability.content}`
+  
+  try {
+    await navigator.clipboard.writeText(abilityText)
+    showCopySuccess('能力內容已複製！')
+  } catch (error) {
+    console.error('複製失敗:', error)
+    // 備用方案：創建臨時文字區域
+    const textArea = document.createElement('textarea')
+    textArea.value = abilityText
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      showCopySuccess('能力內容已複製！')
+    } catch (fallbackError) {
+      alert('複製失敗，請手動複製內容')
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+// 解析能力標題
+const getAbilityTitle = (content) => {
+  if (!content) return null
+  
+  // 匹配冒號前的所有內容作為標題
+  const match = content.match(/^([^：:]+)[：:]/)
+  if (match) {
+    return match[1].trim()
+  }
+  
+  // 如果沒有匹配到冒號，嘗試提取第一行作為標題
+  const firstLine = content.split('\n')[0].trim()
+  if (firstLine.length > 0 && firstLine.length <= 50) {
+    return firstLine
+  }
+  
+  return null
+}
+
+// 獲取能力預覽
+const getAbilityPreview = (content) => {
+  if (!content) return ''
+  
+  // 如果有標題格式，顯示冒號後的內容
+  const match = content.match(/^[^：:]*[：:]\s*(.*)/)
+  if (match) {
+    const preview = match[1].trim()
+    return preview.length > 50 ? preview.substring(0, 50) + '...' : preview
+  }
+  
+  // 否則顯示前50個字符
+  return content.length > 50 ? content.substring(0, 50) + '...' : content
 }
 
 // 隱藏原生 title 工具提示
@@ -634,7 +763,7 @@ const clearForm = () => {
       equipment: '',
       cyphers: [],
       cypherLimit: 0,
-      abilities: '',
+      abilities: [],
       xp: 0,
       background: '',
       recoveryBonus: 0
