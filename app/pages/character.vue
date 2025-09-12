@@ -376,14 +376,61 @@
             <div class="border-2 border-black bg-white p-4">
               <div class="flex items-center justify-between mb-4">
                 <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
-                <div class="flex items-center">
-                  <span class="text-xs bg-red-800 text-white px-2 py-1 mr-2">密鑰上限</span>
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs bg-red-800 text-white px-2 py-1">密鑰上限</span>
                   <input type="number" v-model.number="character.cypherLimit" min="0" class="w-14 px-2 py-1 border-b border-black bg-transparent text-center font-typewriter text-xs focus:outline-none" placeholder="上限">
+                  <button @click="generateRandomCyphers" 
+                          :disabled="character.cypherLimit <= 0"
+                          :class="[
+                            'text-xs px-2 py-1 rounded font-typewriter',
+                            character.cypherLimit <= 0 
+                              ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                              : 'bg-green-700 text-white hover:bg-green-800'
+                          ]">
+                    隨機獲得
+                  </button>
                 </div>
               </div>
-              <textarea v-model="character.cyphers" 
-                        class="w-full h-96 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
-                        placeholder="記錄密鑰道具..."></textarea>
+              
+              <!-- 密鑰列表 -->
+              <div class="space-y-2 max-h-96 overflow-y-auto">
+                <div v-for="(cypher, index) in character.cyphers" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
+                  <div class="flex items-center justify-between mb-2">
+                    <input type="text" v-model="cypher.title" placeholder="密鑰名稱" 
+                           class="flex-1 font-bold text-sm bg-transparent border-b border-gray-400 focus:outline-none focus:border-black mr-2">
+                    <div class="flex items-center space-x-1">
+                      <button @click="copyCypherToClipboard(cypher)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製密鑰詳細內容">
+                        📋
+                      </button>
+                      <button @click="removeCypher(index)" class="text-red-600 hover:text-red-800 text-xs">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                  <div class="flex items-center mb-2">
+                    <span class="text-xs text-gray-600 mr-2">等級：</span>
+                    <input type="text" v-model="cypher.level" placeholder="1d6" 
+                           class="w-16 text-xs bg-transparent border-b border-gray-400 focus:outline-none focus:border-black">
+                  </div>
+                  <textarea v-model="cypher.content" placeholder="密鑰效果描述..." 
+                           class="w-full h-16 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black"
+                           rows="3"></textarea>
+                </div>
+                
+                <!-- 添加新密鑰按鈕 -->
+                <button @click="addNewCypher" 
+                        :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
+                        :class="[
+                          'w-full py-2 border-2 border-dashed rounded text-sm',
+                          character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
+                            ? 'border-gray-300 text-gray-400 cursor-not-allowed' 
+                            : 'border-gray-400 text-gray-600 hover:border-gray-600 hover:text-gray-800'
+                        ]">
+                  {{ character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
+                     ? `已達上限 (${character.cyphers.length}/${character.cypherLimit})` 
+                     : '+ 添加新密鑰' }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -439,13 +486,99 @@ const character = ref({
   stressLevel: 0,
   supernaturalStressMarks: Array(10).fill(false),
   equipment: '',
-  cyphers: '',
+  cyphers: [],
   cypherLimit: 0,
   abilities: '',
   xp: 0,
   background: '',
   recoveryBonus: 0
 })
+
+// 密鑰管理
+const addNewCypher = () => {
+  // 檢查是否達到上限
+  if (character.value.cypherLimit > 0 && character.value.cyphers.length >= character.value.cypherLimit) {
+    alert(`已達密鑰上限 (${character.value.cypherLimit} 個)`)
+    return
+  }
+  
+  character.value.cyphers.push({
+    title: '',
+    level: '',
+    content: ''
+  })
+}
+
+const removeCypher = (index) => {
+  character.value.cyphers.splice(index, 1)
+}
+
+const copyCypherToClipboard = async (cypher) => {
+  const cypherText = `${cypher.title}
+等級：${cypher.level}
+
+${cypher.content}`
+  
+  try {
+    await navigator.clipboard.writeText(cypherText)
+    alert('密鑰內容已複製到剪貼簿！')
+  } catch (error) {
+    console.error('複製失敗:', error)
+    // 備用方案：創建臨時文字區域
+    const textArea = document.createElement('textarea')
+    textArea.value = cypherText
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      alert('密鑰內容已複製到剪貼簿！')
+    } catch (fallbackError) {
+      alert('複製失敗，請手動複製內容')
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+const generateRandomCyphers = async () => {
+  const limit = character.value.cypherLimit || 0
+  if (limit <= 0) {
+    alert('請先設定密鑰上限')
+    return
+  }
+  
+  try {
+    const response = await fetch('/data/cypher.json')
+    const cypherData = await response.json()
+    
+    // 清空現有密鑰
+    character.value.cyphers = []
+    
+    // 隨機選擇密鑰，數量等於密鑰上限
+    for (let i = 0; i < limit; i++) {
+      const randomIndex = Math.floor(Math.random() * cypherData.length)
+      const randomCypher = cypherData[randomIndex]
+      
+      // 處理擲骰表格
+      let content = randomCypher.content
+      if (randomCypher.roll_table) {
+        content += '\n\n' + randomCypher.roll_table.map(item => 
+          `${item.range}：${item.result}`
+        ).join('\n')
+      }
+      
+      character.value.cyphers.push({
+        title: randomCypher.title,
+        level: randomCypher.level,
+        content: content
+      })
+    }
+    
+    alert(`成功生成 ${limit} 個隨機密鑰！`)
+  } catch (error) {
+    console.error('載入密鑰資料失敗:', error)
+    alert('載入密鑰資料失敗，請檢查檔案是否存在')
+  }
+}
 
 // 隱藏原生 title 工具提示
 onMounted(() => {
@@ -499,7 +632,7 @@ const clearForm = () => {
       stressLevel: 0,
   supernaturalStressMarks: Array(10).fill(false),
       equipment: '',
-      cyphers: '',
+      cyphers: [],
       cypherLimit: 0,
       abilities: '',
       xp: 0,
