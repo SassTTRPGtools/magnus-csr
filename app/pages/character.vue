@@ -106,76 +106,176 @@
             </div>
           </div>
 
-          <!-- 恢復骰與傷害軌合併區塊 -->
+          <!-- 恢復骰獨立區塊 -->
           <div class="character-section mb-6">
-            <div class="border-2 border-black bg-white p-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              <!-- 恢復骰（左側） -->
-              <div>
-                <div class="text-xs font-bold uppercase tracking-wide mb-3">恢復骰</div>
-                <div class="space-y-2 text-sm mb-2">
-                  <label class="flex items-center">
-                    <span class="mr-2">1D6 +</span>
-                    <input type="number" v-model.number="character.recoveryBonus" class="w-16 border-b border-black bg-transparent text-center font-typewriter focus:outline-none mr-2">
-                  </label>
-                </div>
-                <div class="space-y-2 text-sm">
-                  <label class="flex items-center">
-                    <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2">
-                    <span>動作</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2">
-                    <span>10 分鐘</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2">
-                    <span>1 小時</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2">
-                    <span>10 小時</span>
-                  </label>
-                </div>
+            <div class="border-2 border-black bg-white p-4">
+              <div class="text-xs font-bold uppercase tracking-wide mb-3">恢復骰</div>
+              <div class="space-y-2 text-sm mb-2">
+                <label class="flex items-center">
+                  <span class="mr-2">1D6 +</span>
+                  <input type="number" v-model.number="character.recoveryBonus" class="w-16 border-b border-black bg-transparent text-center font-typewriter focus:outline-none">
+                </label>
               </div>
-              <!-- 傷害軌（右側） -->
-              <div>
-                <div class="text-xs font-bold uppercase tracking-wide mb-3">傷害軌</div>
-                <div class="space-y-2 text-sm">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="character.damageTrack" value="hale" class="mr-2">
-                    <span class="font-bold">強健</span>
-                  </label>
-                  <!-- 連結線與輕傷 -->
-                  <div class="flex items-center my-2">
-                    <div class="w-8 h-0.5 bg-gray-400 mx-2"></div>
-                    <label class="flex items-center">
-                      <input type="radio" v-model="character.damageTrack" value="hurt" class="mr-1">
-                      <span class="text-xs font-bold text-red-700">輕傷</span>
+              <div class="space-y-1 text-xs">
+                <label class="flex items-center">
+                  <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2 scale-75">
+                  <span>動作</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2 scale-75">
+                  <span>10 分鐘</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2 scale-75">
+                  <span>1 小時</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2 scale-75">
+                  <span>10 小時</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 傷害軌、壓力與理智軌三欄整合區塊 -->
+          <div class="character-section mb-6">
+            <div class="border-2 border-black bg-white p-3">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                
+                <!-- 傷害軌（左欄） -->
+                <div class="border-r border-gray-300 pr-3">
+                  <div class="text-xs font-bold uppercase tracking-wide mb-3">傷害軌</div>
+                  <div class="space-y-1 text-xs">
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.damageTrack" value="hale" class="mr-1 scale-75">
+                      <span class="font-bold">強健</span>
                     </label>
-                    <div class="w-8 h-0.5 bg-gray-400 mx-2"></div>
+                    <!-- 連結線與輕傷 -->
+                    <div class="flex items-center my-1">
+                      <div class="w-4 h-0.5 bg-gray-400 mx-1"></div>
+                      <label class="flex items-center track-item p-1">
+                        <input type="radio" v-model="character.damageTrack" value="hurt" class="mr-1 scale-75">
+                        <span class="text-xs font-bold text-red-700" title="僅部分角色可用">輕傷</span>
+                      </label>
+                      <div class="w-4 h-0.5 bg-gray-400 mx-1"></div>
+                    </div>
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.damageTrack" value="impaired" class="mr-1 scale-75">
+                      <span class="font-bold text-red-600" title="應用努力的成本 +1；弱效/強效影響無效；戰鬥時特殊骰面只會 +1">帶傷</span>
+                    </label>
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.damageTrack" value="debilitated" class="mr-1 scale-75">
+                      <span class="font-bold text-red-800" title="只能移動鄰近距離（通常是爬行）；如果速度池為0則無法移動">重創</span>
+                    </label>
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.damageTrack" value="dead" class="mr-1 scale-75">
+                      <span class="font-bold text-black">死亡</span>
+                    </label>
                   </div>
-                  <div class="text-xs text-gray-500 ml-8 mb-2">僅部分角色可用</div>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="character.damageTrack" value="impaired" class="mr-2">
-                    <span class="font-bold text-red-600">帶傷</span>
-                  </label>
-                  <div class="ml-6 text-xs text-gray-600">
-                    <div>• 應用努力的成本 +1</div>
-                    <div>• 弱效/強效影響無效</div>
-                    <div>• 戰鬥時特殊骰面只會 +1</div>
+                </div>
+
+                <!-- 壓力（中欄） -->
+                <div class="border-r border-gray-300 pr-3 relative">
+                  <!-- 上方壓力標題區 -->
+                  <div class="mb-3">
+                    <!-- 壓力圓形血跡背景 -->
+                    <div class="relative mb-2">
+                      <div class="w-16 h-16 mx-auto relative">
+                        <!-- 血跡背景 -->
+                        <div class="absolute inset-0 bg-red-900 rounded-full transform rotate-12" style="clip-path: polygon(20% 0%, 100% 30%, 90% 90%, 10% 100%, 0% 60%)"></div>
+                        <div class="absolute inset-1 bg-red-800 rounded-full transform -rotate-6" style="clip-path: polygon(30% 10%, 95% 25%, 85% 85%, 15% 95%, 5% 65%)"></div>
+                        <!-- 中心白色方框 -->
+                        <div class="absolute inset-3 bg-white border-2 border-black flex items-center justify-center">
+                          <input type="number" v-model.number="character.currentStress" 
+                                 class="w-full text-center font-bold text-sm bg-transparent border-none focus:outline-none">
+                        </div>
+                        <!-- STRESS 標籤 -->
+                        <div class="absolute -top-1 -left-1 bg-red-900 text-white text-xs font-bold px-1 py-0.5 transform -rotate-12 rounded">
+                          壓力
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 壓力等級圓形血跡背景 -->
+                    <div class="relative">
+                      <div class="w-16 h-16 mx-auto relative">
+                        <!-- 血跡背景 -->
+                        <div class="absolute inset-0 bg-red-900 rounded-full transform -rotate-12" style="clip-path: polygon(15% 5%, 95% 20%, 100% 80%, 20% 95%, 0% 50%)"></div>
+                        <div class="absolute inset-1 bg-red-800 rounded-full transform rotate-8" style="clip-path: polygon(25% 15%, 90% 30%, 95% 75%, 25% 90%, 10% 55%)"></div>
+                        <!-- 中心白色方框 -->
+                        <div class="absolute inset-3 bg-white border-2 border-black flex items-center justify-center">
+                          <input type="number" v-model.number="character.stressLevel" 
+                                 class="w-full text-center font-bold text-sm bg-transparent border-none focus:outline-none">
+                        </div>
+                        <!-- STRESS LEVEL 標籤 -->
+                        <div class="absolute -top-1 -right-1 bg-red-900 text-white text-xs font-bold px-1 py-0.5 transform rotate-12 rounded text-center leading-tight">
+                          等級
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="character.damageTrack" value="debilitated" class="mr-2">
-                    <span class="font-bold text-red-800">重創</span>
-                  </label>
-                  <div class="ml-6 text-xs text-gray-600">
-                    <div>• 只能移動鄰近距離（通常是爬行）</div>
-                    <div>• 如果速度池為0則無法移動</div>
+
+                  <!-- 黑色背景的方格區域 -->
+                  <div class="bg-black p-2 rounded">
+                    <!-- 白色標題 -->
+                    <div class="text-white text-xs font-bold text-center mb-1 uppercase tracking-wide leading-tight">
+                      源自超自然來源<br>的壓力值
+                    </div>
+                    
+                    <!-- 5x2 白色方格 -->
+                    <div class="grid grid-cols-5 gap-1">
+                      <div v-for="level in 10" :key="level" 
+                        class="w-5 h-5 border border-gray-300 relative"
+                        :style="character.supernaturalStressMarks[level-1] ? 'background-color:#2d5a2d;' : 'background-color:#fff;'">
+                        <input type="checkbox" v-model="character.supernaturalStressMarks[level-1]" 
+                               class="w-full h-full opacity-0 absolute left-0 top-0 cursor-pointer">
+                        <span v-if="character.supernaturalStressMarks[level-1]" class="absolute left-0 top-0 w-full h-full flex items-center justify-center pointer-events-none">
+                          <svg width="14" height="14" viewBox="0 0 18 18"><polyline points="4,10 8,14 14,6" stroke="white" stroke-width="2.5" fill="none"/></svg>
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="character.damageTrack" value="dead" class="mr-2">
-                    <span class="font-bold text-black">死亡</span>
-                  </label>
+                </div>
+
+                <!-- 理智軌（右欄） -->
+                <div>
+                  <div class="text-xs font-bold uppercase tracking-wide mb-3 sanity-title" title="崩潰發作時擲骰 1D20，心理崩潰骰到 19-20 或完全崩潰骰到 20 將發生勇氣爆發。勇氣爆發：你忽略崩潰結果與壓力量級導致的任務受阻，但仍舊會承受重傷，到緊迫的危機解除。">理智軌</div>
+                  <div class="space-y-1 text-xs">
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="calm" class="mr-1 scale-75">
+                      <span class="font-bold" title="正常狀態">平靜</span>
+                    </label>
+                    
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="uneasy" class="mr-1 scale-75">
+                      <span class="font-bold text-yellow-600" title="表現在扮演上">不安</span>
+                    </label>
+                    
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="shaken" class="mr-1 scale-75">
+                      <span class="font-bold text-orange-600" title="表現在扮演上">動搖</span>
+                    </label>
+                    
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="neurotic" class="mr-1 scale-75">
+                      <span class="font-bold text-red-600" title="心理崩潰發作，擲骰隨機表">神經質</span>
+                    </label>
+                    
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="irrational" class="mr-1 scale-75">
+                      <span class="font-bold text-red-700" title="表現在扮演上">不理性</span>
+                    </label>
+                    
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="insane" class="mr-1 scale-75">
+                      <span class="font-bold text-red-800" title="心理崩潰發作，擲骰隨機表">精神錯亂</span>
+                    </label>
+                    
+                    <label class="flex items-center track-item p-1">
+                      <input type="radio" v-model="character.sanityTrack" value="breakdown" class="mr-1 scale-75">
+                      <span class="font-bold text-black" title="完全崩潰發作，你陷入不可控制的狀態，當狀態結束時回到神經質階段，且永久留下一個症狀">完全崩潰</span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -254,35 +354,6 @@
             </div>
           </div>
 
-          <!-- 壓力區塊 -->
-          <div class="character-section mb-6">
-            <div class="border-2 border-black bg-white p-4 relative">
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-sm font-bold uppercase tracking-wide">壓力</div>
-                <div class="text-xs bg-red-800 text-white px-2 py-1 transform -rotate-3">
-                  壓力等級
-                </div>
-              </div>
-              <!-- 壓力等級方格 -->
-              <div class="grid grid-cols-3 gap-2 mb-4">
-                <div v-for="level in 9" :key="level" class="aspect-square border-2 border-black bg-white">
-                  <input type="checkbox" v-model="character.stressLevels[level-1]" 
-                         class="w-full h-full">
-                </div>
-              </div>
-              <div class="text-xs uppercase font-bold tracking-wide mb-2">
-                壓力等級來源於超自然事件
-              </div>
-              <!-- 血跡裝飾效果 -->
-              <div class="absolute top-1 right-1 w-12 h-12 opacity-40">
-                <div class="w-full h-full bg-red-700 rounded-full transform rotate-45 relative">
-                  <div class="absolute top-2 left-2 w-3 h-3 bg-red-900 rounded-full"></div>
-                  <div class="absolute bottom-1 right-1 w-2 h-2 bg-red-900 rounded-full"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- 技能 -->
           <div class="character-section">
             <div class="border-2 border-black bg-white p-4">
@@ -313,7 +384,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const character = ref({
   name: '',
@@ -344,13 +415,39 @@ const character = ref({
     tenHours: false
   },
   damageTrack: 'hale',
-  stressLevels: Array(9).fill(false),
+  sanityTrack: 'calm',
+  currentStress: 0,
+  stressLevel: 0,
+  supernaturalStressMarks: Array(10).fill(false),
   equipment: '',
   cyphers: '',
   abilities: '',
   xp: 0,
   background: '',
   recoveryBonus: 0
+})
+
+// 隱藏原生 title 工具提示
+onMounted(() => {
+  const elementsWithTitle = document.querySelectorAll('[title]')
+  elementsWithTitle.forEach(element => {
+    const originalTitle = element.getAttribute('title')
+    element.setAttribute('data-tooltip', originalTitle)
+    element.removeAttribute('title')
+    
+    let timeout
+    
+    element.addEventListener('mouseenter', () => {
+      timeout = setTimeout(() => {
+        element.setAttribute('title', originalTitle)
+      }, 1000) // 延遲1秒再顯示原生提示（實際上我們的自定義提示會先顯示）
+    })
+    
+    element.addEventListener('mouseleave', () => {
+      clearTimeout(timeout)
+      element.removeAttribute('title')
+    })
+  })
 })
 
 const saveCharacter = () => {
@@ -377,7 +474,10 @@ const clearForm = () => {
         tenHours: false
       },
       damageTrack: 'hale',
-      stressLevels: Array(9).fill(false),
+      sanityTrack: 'calm',
+      currentStress: 0,
+      stressLevel: 0,
+  supernaturalStressMarks: Array(10).fill(false),
       equipment: '',
       cyphers: '',
       abilities: '',
@@ -455,5 +555,131 @@ h1, h2 {
   border-radius: 50% 30% 60% 40%;
   opacity: 0.3;
   transform: rotate(45deg);
+}
+
+/* Magnus Archives 風格的 Tooltip */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+  color: #e5e1d8;
+  padding: 12px 16px;
+  border-radius: 6px;
+  z-index: 9999;
+  font-size: 12px;
+  font-weight: normal;
+  border: 2px solid #a13c3c;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(161, 60, 60, 0.4),
+    0 0 20px rgba(161, 60, 60, 0.3);
+  animation: fadeInTooltip 0.3s ease-out;
+  max-width: 280px;
+  min-width: 120px;
+  white-space: normal;
+  line-height: 1.4;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  /* 智能邊界檢測 */
+  right: auto;
+}
+
+/* 針對螢幕右側的元素調整工具提示位置 */
+.grid > div:last-child [data-tooltip]:hover::before {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
+/* 針對螢幕左側的元素調整工具提示位置 */
+.grid > div:first-child [data-tooltip]:hover::before {
+  left: 0;
+  transform: translateX(0);
+}
+
+[data-tooltip]:hover::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #a13c3c;
+  z-index: 9998;
+  animation: fadeInTooltip 0.3s ease-out;
+  pointer-events: none;
+}
+
+/* 箭頭位置調整 */
+.grid > div:last-child [data-tooltip]:hover::after {
+  left: auto;
+  right: 20px;
+  transform: translateX(0);
+}
+
+.grid > div:first-child [data-tooltip]:hover::after {
+  left: 20px;
+  transform: translateX(0);
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 理智軌標題特殊效果 */
+.sanity-title:hover {
+  color: #a13c3c;
+  text-shadow: 0 0 8px rgba(161, 60, 60, 0.6);
+  transition: all 0.3s ease;
+}
+
+/* 傷害軌和理智軌項目懸浮效果 */
+.track-item:hover {
+  background-color: rgba(161, 60, 60, 0.1);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+/* 壓力方格特殊樣式 */
+.bg-black input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.bg-black input[type="checkbox"]:checked {
+  background-color: #000000;
+  border: 2px solid #ffffff;
+}
+
+.bg-black input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
