@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
+/* Magnus Archives 主題色調 */
+body {
+  background-color: #181c1b;
+  color: #e5e1d8;
+  font-family: 'Special Elite', 'Courier New', monospace;
+}
+
+.magnus-paper {
+  background-color: #232a25;
+  color: #e5e1d8;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #6b7a6a;
+}
+
+.magnus-accent {
+  color: #a13c3c;
+}
+@tailwind components;
+@tailwind utilities;
+
+/* Magnus Archives 主題色調 */
+body {
+	@apply bg-magnus-bg text-magnus-text font-typewriter;
+}
+
+.magnus-paper {
+	@apply bg-magnus-paper text-magnus-text shadow-lg rounded-lg p-4;
+}
+
+.magnus-accent {
+	@apply text-magnus-accent;
+}

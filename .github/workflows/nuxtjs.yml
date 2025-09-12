@@ -1,0 +1,101 @@
+# Sample workflow for building and deploying a Nuxt site to GitHub Pages
+#
+# To get started with Nuxt see: https://nuxtjs.org/docs/get-started/installation
+#
+name: Deploy Nuxt site to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+      - name: Generate Nuxt
+        run: |
+          echo "Generating Nuxt project for static deployment..."
+          npm run generate
+          
+          echo "Checking generated output..."
+          echo "Output directory contents:"
+          ls -la .output/public/
+          
+          echo "Checking _nuxt directory:"
+          if [ -d ".output/public/_nuxt" ]; then
+            ls -la .output/public/_nuxt/
+          else
+            echo "ERROR: _nuxt directory not found!"
+            exit 1
+          fi
+          
+          echo "Verifying important files:"
+          if [ -f ".output/public/index.html" ]; then
+            echo "✓ index.html exists"
+            echo "index.html content:"
+            head -20 .output/public/index.html
+          else
+            echo "ERROR: index.html not found!"
+            exit 1
+          fi
+          
+          echo "Checking for JavaScript files:"
+          JS_FILES=$(find .output/public/_nuxt -name "*.js" | wc -l)
+          echo "Found $JS_FILES JavaScript files"
+          
+          echo "Checking for CSS files:"
+          CSS_FILES=$(find .output/public/_nuxt -name "*.css" | wc -l)
+          echo "Found $CSS_FILES CSS files"
+          
+          if [ $JS_FILES -eq 0 ]; then
+            echo "ERROR: No JavaScript files found!"
+            exit 1
+          fi
+          
+          echo "All files generated successfully!"
+          echo "Final file count:"
+          find .output/public -type f | wc -l
+      - name: Add .nojekyll
+        run: |
+          touch .output/public/.nojekyll
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
