@@ -1,20 +1,7 @@
 <template>
   <div class="min-h-screen bg-magnus-bg p-4">
     <div class="max-w-7xl mx-auto">
-      <!-- 標題 -->
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-green-600 font-typewriter tracking-wider mb-2">
-          THE MAGNUS
-        </h1>
-        <h2 class="text-2xl font-bold text-green-600 font-typewriter tracking-widest mb-1">
-          ARCHIVES
-        </h2>
-        <p class="text-sm text-magnus-text font-typewriter tracking-wide">
-          ROLEPLAYING GAME
-        </p>
-      </div>
-
-      <!-- 三欄式佈局 -->
+      <!-- 三欄式佈局 - 標題夾在中間 -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- 左欄 - 基本資訊與屬性 -->
@@ -65,82 +52,126 @@
               </div>
               
               <!-- Pool 行 -->
-        <div class="grid grid-cols-3 text-center border-b border-black">
-          <input type="number" v-model.number="character.might.current" 
-          class="p-4 border-r border-black bg-transparent text-center font-typewriter text-xl focus:outline-none">
-          <input type="number" v-model.number="character.speed.current" 
-          class="p-4 border-r border-black bg-transparent text-center font-typewriter text-xl focus:outline-none">
-          <input type="number" v-model.number="character.intellect.current" 
-          class="p-4 bg-transparent text-center font-typewriter text-xl focus:outline-none">
-        </div>
+              <div class="grid grid-cols-3 text-center border-b border-black">
+                <input type="number" v-model.number="character.might.current" 
+                       class="p-4 border-r border-black bg-transparent text-center font-typewriter text-xl focus:outline-none">
+                <input type="number" v-model.number="character.speed.current" 
+                       class="p-4 border-r border-black bg-transparent text-center font-typewriter text-xl focus:outline-none">
+                <input type="number" v-model.number="character.intellect.current" 
+                       class="p-4 bg-transparent text-center font-typewriter text-xl focus:outline-none">
+              </div>
               
               <!-- Edge 標籤 -->
-                <div class="grid grid-cols-3 text-center text-xs border-t border-black">
-                  <!-- 氣力 -->
-                  <div class="grid grid-cols-2 gap-1 p-1 border-r border-black">
-                    <div>
-                      <span class="block mb-1">池</span>
-                      <input type="number" v-model.number="character.might.pool" 
-                             class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
-                    </div>
-                    <div>
-                      <span class="block mb-1">節省值</span>
-                      <input type="number" v-model.number="character.might.edge" 
-                             class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
-                    </div>
+              <div class="grid grid-cols-3 text-center text-xs border-t border-black">
+                <!-- 氣力 -->
+                <div class="grid grid-cols-2 gap-1 p-1 border-r border-black">
+                  <div>
+                    <span class="block mb-1">池</span>
+                    <input type="number" v-model.number="character.might.pool" 
+                           class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
                   </div>
-                  <!-- 速度 -->
-                  <div class="grid grid-cols-2 gap-1 p-1 border-r border-black">
-                    <div>
-                      <span class="block mb-1">池</span>
-                      <input type="number" v-model.number="character.speed.pool" 
-                             class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
-                    </div>
-                    <div>
-                      <span class="block mb-1">節省值</span>
-                      <input type="number" v-model.number="character.speed.edge" 
-                             class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
-                    </div>
-                  </div>
-                  <!-- 智力 -->
-                  <div class="grid grid-cols-2 gap-1 p-1">
-                    <div>
-                      <span class="block mb-1">池</span>
-                      <input type="number" v-model.number="character.intellect.pool" 
-                             class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
-                    </div>
-                    <div>
-                      <span class="block mb-1">節省值</span>
-                      <input type="number" v-model.number="character.intellect.edge" 
-                             class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
-                    </div>
+                  <div>
+                    <span class="block mb-1">節省值</span>
+                    <input type="number" v-model.number="character.might.edge" 
+                           class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
                   </div>
                 </div>
+                <!-- 速度 -->
+                <div class="grid grid-cols-2 gap-1 p-1 border-r border-black">
+                  <div>
+                    <span class="block mb-1">池</span>
+                    <input type="number" v-model.number="character.speed.pool" 
+                           class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
+                  </div>
+                  <div>
+                    <span class="block mb-1">節省值</span>
+                    <input type="number" v-model.number="character.speed.edge" 
+                           class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
+                  </div>
+                </div>
+                <!-- 智力 -->
+                <div class="grid grid-cols-2 gap-1 p-1">
+                  <div>
+                    <span class="block mb-1">池</span>
+                    <input type="number" v-model.number="character.intellect.pool" 
+                           class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
+                  </div>
+                  <div>
+                    <span class="block mb-1">節省值</span>
+                    <input type="number" v-model.number="character.intellect.edge" 
+                           class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- 回復滾動 & 傷害軌道 -->
+          <!-- 回復滾動 -->
           <div class="character-section mb-6">
             <div class="border-2 border-black bg-white p-4">
               <div class="text-xs font-bold uppercase tracking-wide mb-3">恢復骰</div>
               <div class="space-y-2 text-sm">
                 <label class="flex items-center">
-                  <input type="checkbox" class="mr-2">
+                  <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2">
                   <span>動作</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" class="mr-2">
+                  <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2">
                   <span>10 分鐘</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" class="mr-2">
+                  <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2">
                   <span>1 小時</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" class="mr-2">
+                  <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2">
                   <span>10 小時</span>
                 </label>
               </div>
+            </div>
+          </div>
+
+          <!-- 傷害軌 -->
+          <div class="character-section mb-6">
+            <div class="border-2 border-black bg-white p-4 relative">
+              <div class="text-xs font-bold uppercase tracking-wide mb-3">傷害軌</div>
+              <div class="space-y-2 text-sm">
+                <label class="flex items-center">
+                  <input type="radio" v-model="character.damageTrack" value="hale" class="mr-2">
+                  <span class="font-bold">強健</span>
+                </label>
+                <div class="flex items-center my-2">
+                  <div class="w-8 h-0.5 bg-gray-400 mx-2"></div>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="character.damageTrack" value="hurt" class="mr-1">
+                    <span class="text-xs font-bold text-red-700">輕傷—僅部分角色可用</span>
+                  </label>
+                </div>
+                <label class="flex items-center">
+                  <input type="radio" v-model="character.damageTrack" value="impaired" class="mr-2">
+                  <span class="font-bold text-red-600">帶傷</span>
+                </label>
+                <div class="ml-6 text-xs text-gray-600">
+                  <div>• 應用努力的成本 +1</div>
+                  <div>• 弱效/強效影響無效</div>
+                  <div>• 戰鬥時特殊骰面只會 +1</div>
+                  <div>• +1傷害</div>
+                </div>
+                <label class="flex items-center">
+                  <input type="radio" v-model="character.damageTrack" value="debilitated" class="mr-2">
+                  <span class="font-bold text-red-800">重創</span>
+                </label>
+                <div class="ml-6 text-xs text-gray-600">
+                  <div>• 只能移動鄰近距離（通常是爬行）</div>
+                  <div>• 速度池為0則無法移動</div>
+                </div>
+                <label class="flex items-center">
+                  <input type="radio" v-model="character.damageTrack" value="dead" class="mr-2">
+                  <span class="font-bold text-black">死亡</span>
+                </label>
+              </div>
+              <!-- 血跡裝飾 -->
+              <div class="absolute top-2 right-2 w-8 h-8 bg-red-600 rounded-full opacity-30 transform rotate-12"></div>
             </div>
           </div>
 
@@ -174,13 +205,27 @@
           </div>
         </div>
 
-        <!-- 中欄 - 特殊能力 -->
+        <!-- 中欄 - 標題與特殊能力 -->
         <div class="character-sheet-column">
+          <!-- 標題 -->
+          <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-green-600 font-typewriter tracking-wider mb-2">
+              THE MAGNUS
+            </h1>
+            <h2 class="text-2xl font-bold text-green-600 font-typewriter tracking-widest mb-1">
+              ARCHIVES
+            </h2>
+            <p class="text-sm text-magnus-text font-typewriter tracking-wide">
+              ROLEPLAYING GAME
+            </p>
+          </div>
+          
+          <!-- 特殊能力 -->
           <div class="character-section h-full">
-            <div class="border-2 border-black bg-white p-4 h-full">
+            <div class="border-2 border-black bg-white p-4 h-96">
               <div class="text-center text-sm font-bold uppercase tracking-wide mb-4">能力</div>
               <textarea v-model="character.abilities" 
-                        class="w-full h-96 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
+                        class="w-full h-80 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
                         placeholder="記錄角色的特殊能力..."></textarea>
             </div>
           </div>
@@ -203,6 +248,35 @@
             </div>
           </div>
 
+          <!-- 壓力區塊 -->
+          <div class="character-section mb-6">
+            <div class="border-2 border-black bg-white p-4 relative">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-sm font-bold uppercase tracking-wide">壓力</div>
+                <div class="text-xs bg-red-800 text-white px-2 py-1 transform -rotate-3">
+                  壓力等級
+                </div>
+              </div>
+              <!-- 壓力等級方格 -->
+              <div class="grid grid-cols-3 gap-2 mb-4">
+                <div v-for="level in 9" :key="level" class="aspect-square border-2 border-black bg-white">
+                  <input type="checkbox" v-model="character.stressLevels[level-1]" 
+                         class="w-full h-full">
+                </div>
+              </div>
+              <div class="text-xs uppercase font-bold tracking-wide mb-2">
+                壓力等級來源於超自然事件
+              </div>
+              <!-- 血跡裝飾效果 -->
+              <div class="absolute top-1 right-1 w-12 h-12 opacity-40">
+                <div class="w-full h-full bg-red-700 rounded-full transform rotate-45 relative">
+                  <div class="absolute top-2 left-2 w-3 h-3 bg-red-900 rounded-full"></div>
+                  <div class="absolute bottom-1 right-1 w-2 h-2 bg-red-900 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 技能 -->
           <div class="character-section">
             <div class="border-2 border-black bg-white p-4">
@@ -212,11 +286,6 @@
               <div class="space-y-1">
                 <div v-for="n in 15" :key="n" class="flex items-center border-b border-gray-300 pb-1">
                   <input type="text" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
-                  <div class="grid grid-cols-3 gap-1 w-12">
-                    <input type="checkbox" class="w-3 h-3">
-                    <input type="checkbox" class="w-3 h-3">
-                    <input type="checkbox" class="w-3 h-3">
-                  </div>
                 </div>
               </div>
             </div>
@@ -262,6 +331,14 @@ const character = ref({
     edge: 0,
     current: 0
   },
+  recoveryRolls: {
+    action: false,
+    tenMin: false,
+    oneHour: false,
+    tenHours: false
+  },
+  damageTrack: 'hale',
+  stressLevels: Array(9).fill(false),
   equipment: '',
   cyphers: '',
   abilities: '',
@@ -283,9 +360,17 @@ const clearForm = () => {
       focus: '',
       tier: 1,
       effort: 1,
-      might: { pool: 0, edge: 0 },
-      speed: { pool: 0, edge: 0 },
-      intellect: { pool: 0, edge: 0 },
+      might: { pool: 0, edge: 0, current: 0 },
+      speed: { pool: 0, edge: 0, current: 0 },
+      intellect: { pool: 0, edge: 0, current: 0 },
+      recoveryRolls: {
+        action: false,
+        tenMin: false,
+        oneHour: false,
+        tenHours: false
+      },
+      damageTrack: 'hale',
+      stressLevels: Array(9).fill(false),
       equipment: '',
       cyphers: '',
       abilities: '',
