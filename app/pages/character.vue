@@ -109,30 +109,38 @@
           <!-- 恢復骰獨立區塊 -->
           <div class="character-section mb-6">
             <div class="border-2 border-black bg-white p-4">
-              <div class="text-xs font-bold uppercase tracking-wide mb-3">恢復骰</div>
-              <div class="space-y-2 text-sm mb-2">
-                <label class="flex items-center">
-                  <span class="mr-2">1D6 +</span>
-                  <input type="number" v-model.number="character.recoveryBonus" class="w-16 border-b border-black bg-transparent text-center font-typewriter focus:outline-none">
-                </label>
-              </div>
-              <div class="space-y-1 text-xs">
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2 scale-75">
-                  <span>動作</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2 scale-75">
-                  <span>10 分鐘</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2 scale-75">
-                  <span>1 小時</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2 scale-75">
-                  <span>10 小時</span>
-                </label>
+              <div class="text-sm font-bold uppercase tracking-wide mb-3 text-center">恢復骰</div>
+              
+              <!-- 兩欄佈局 -->
+              <div class="grid grid-cols-2 gap-4">
+                <!-- 左欄：1D6 + 輸入框 -->
+                <div class="flex flex-col items-center justify-center">
+                  <div class="border-2 border-black bg-gray-50 p-4 w-20 h-20 flex flex-col items-center justify-center">
+                    <div class="text-lg font-bold font-typewriter mb-1">1d6+</div>
+                    <input type="number" v-model.number="character.recoveryBonus" 
+                           class="w-12 bg-transparent text-center font-typewriter font-bold text-xl border-b-2 border-black focus:outline-none mt-1">
+                  </div>
+                </div>
+                
+                <!-- 右欄：2x2 checkbox grid -->
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
+                    <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2 scale-90">
+                    <span class="font-medium">動作</span>
+                  </label>
+                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
+                    <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2 scale-90">
+                    <span class="font-medium">10分鐘</span>
+                  </label>
+                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
+                    <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2 scale-90">
+                    <span class="font-medium">1小時</span>
+                  </label>
+                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
+                    <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2 scale-90">
+                    <span class="font-medium">10小時</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -209,7 +217,7 @@
                         </div>
                         <!-- STRESS LEVEL 標籤 -->
                         <div class="absolute -top-1 -right-1 bg-red-900 text-white text-xs font-bold px-1 py-0.5 transform rotate-12 rounded text-center leading-tight">
-                          等級
+                          壓力量級
                         </div>
                       </div>
                     </div>
@@ -311,7 +319,7 @@
           </div>
         </div>
 
-        <!-- 中欄 - 標題與特殊能力 -->
+        <!-- 中欄 - 標題、技能與攻擊 -->
         <div class="character-sheet-column">
           <!-- 標題 -->
           <div class="text-center mb-8">
@@ -325,37 +333,18 @@
               ROLEPLAYING GAME
             </p>
           </div>
-          
-          <!-- 特殊能力 -->
-          <div class="character-section h-full">
-            <div class="border-2 border-black bg-white p-4 h-96">
-              <div class="text-center text-sm font-bold uppercase tracking-wide mb-4">能力</div>
-              <textarea v-model="character.abilities" 
-                        class="w-full h-80 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
-                        placeholder="記錄角色的特殊能力..."></textarea>
-            </div>
-          </div>
-        </div>
 
-        <!-- 右欄 - 密鑰與技能 -->
-        <div class="character-sheet-column">
-          <!-- 密鑰 -->
-          <div class="character-section mb-6">
-            <div class="border-2 border-black bg-white p-4">
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
-                <div class="text-xs bg-red-800 text-white px-2 py-1">
-                  密鑰上限
-                </div>
-              </div>
-              <textarea v-model="character.cyphers" 
-                        class="w-full h-32 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
-                        placeholder="記錄密鑰道具..."></textarea>
-            </div>
-          </div>
-
-          <!-- 技能 -->
+          <!-- 攻擊 -->
           <div class="character-section">
+            <div class="border-2 border-black bg-white p-4">
+              <div class="text-sm font-bold uppercase tracking-wide mb-4">攻擊</div>
+                <div v-for="n in 4" :key="n" class="flex items-center border-b border-gray-300 pb-1">
+                  <input type="text" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
+                </div>
+            </div>
+          </div>
+          <!-- 技能 -->
+          <div class="character-section mb-6">
             <div class="border-2 border-black bg-white p-4">
               <div class="text-sm font-bold uppercase tracking-wide mb-4">
                 技能
@@ -367,15 +356,45 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 底部攻擊區域 -->
-      <div class="mt-6">
-        <div class="border-2 border-black bg-white p-4">
-          <div class="text-sm font-bold uppercase tracking-wide mb-4">攻擊</div>
-          <div v-for="n in 4" :key="n" class="grid grid-cols-12 gap-2 mb-2">
-            <input type="text" class="col-span-6 bg-transparent border-b border-gray-300 font-typewriter text-sm focus:outline-none">
+          <!-- 裝備 -->
+          <div class="character-section">
+            <div class="border-2 border-black bg-white p-4">
+              <div class="text-center text-sm font-bold uppercase tracking-wide mb-4">裝備</div>
+              <textarea v-model="character.abilities" 
+                        class="w-full h-80 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
+                        placeholder="記錄裝備..."></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 右欄 - 密鑰與能力 -->
+        <div class="character-sheet-column">
+          <!-- 密鑰 -->
+          <div class="character-section mb-6">
+            <div class="border-2 border-black bg-white p-4">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
+                <div class="flex items-center">
+                  <span class="text-xs bg-red-800 text-white px-2 py-1 mr-2">密鑰上限</span>
+                  <input type="number" v-model.number="character.cypherLimit" min="0" class="w-14 px-2 py-1 border-b border-black bg-transparent text-center font-typewriter text-xs focus:outline-none" placeholder="上限">
+                </div>
+              </div>
+              <textarea v-model="character.cyphers" 
+                        class="w-full h-96 bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
+                        placeholder="記錄密鑰道具..."></textarea>
+            </div>
+          </div>
+
+          <!-- 能力 -->
+          <div class="character-section h-full">
+            <div class="border-2 border-black bg-white p-4 h-full">
+              <div class="text-center text-sm font-bold uppercase tracking-wide mb-4">能力</div>
+              <textarea v-model="character.abilities" 
+                        class="w-full h-full bg-transparent font-typewriter text-sm border-none resize-none focus:outline-none"
+                        placeholder="記錄角色的特殊能力..."></textarea>
+            </div>
           </div>
         </div>
       </div>
@@ -421,6 +440,7 @@ const character = ref({
   supernaturalStressMarks: Array(10).fill(false),
   equipment: '',
   cyphers: '',
+  cypherLimit: 0,
   abilities: '',
   xp: 0,
   background: '',
@@ -480,6 +500,7 @@ const clearForm = () => {
   supernaturalStressMarks: Array(10).fill(false),
       equipment: '',
       cyphers: '',
+      cypherLimit: 0,
       abilities: '',
       xp: 0,
       background: '',
