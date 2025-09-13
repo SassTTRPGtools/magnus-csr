@@ -186,6 +186,14 @@
                       <span class="font-bold text-black">死亡</span>
                     </label>
                   </div>
+                  
+                  <!-- 複製狀態值按鈕 -->
+                  <div class="mt-3 pt-2 border-t border-gray-300">
+                    <button @click="copyStatusToClipboard" 
+                            class="w-full text-xs px-2 py-1 bg-blue-600 text-white hover:bg-blue-700 rounded font-typewriter">
+                      📋 複製狀態值
+                    </button>
+                  </div>
                 </div>
 
                 <!-- 壓力（中欄） -->
@@ -379,12 +387,60 @@
           <!-- 技能 -->
           <div class="character-section mb-6">
             <div class="border-2 border-black bg-white p-4">
-              <div class="text-sm font-bold uppercase tracking-wide mb-4">
-                技能
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-sm font-bold uppercase tracking-wide">技能</div>
+                <button @click="toggleAllSkillsEditing" 
+                        :class="[
+                          'text-xs px-3 py-2 rounded border font-typewriter transition-colors',
+                          allSkillsEditing 
+                            ? 'text-green-600 border-green-300 bg-green-50 hover:bg-green-100' 
+                            : 'text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100'
+                        ]">
+                  {{ allSkillsEditing ? '鎖定' : '編輯' }}
+                </button>
               </div>
               <div class="space-y-1">
-                <div v-for="n in 15" :key="n" class="flex items-center border-b border-gray-300 pb-1">
-                  <input type="text" v-model="character.skills[n-1]" class="flex-1 bg-transparent font-typewriter text-sm focus:outline-none mr-2">
+                <div v-for="(skill, idx) in character.skills" :key="idx" class="flex items-center border-b border-gray-300 pb-1">
+                  <!-- 編輯模式 -->
+                  <template v-if="skill.editing">
+                    <input type="text"
+                           v-model="skill.text"
+                           class="flex-1 font-typewriter text-sm focus:outline-none mr-2 bg-yellow-50 border border-yellow-300 rounded px-2 py-1"
+                           placeholder="技能名稱">
+                    <select v-model="skill.level" 
+                            class="px-2 py-1 border border-yellow-300 rounded text-xs font-typewriter focus:outline-none bg-yellow-50 mr-2">
+                      <option value="normal">熟練</option>
+                      <option value="none">無能</option>
+                      <option value="trained">受訓</option>
+                      <option value="expert">專精</option>
+                    </select>
+                  </template>
+                  
+                  <!-- 顯示模式 -->
+                  <template v-else>
+                    <span :class="[
+                            'flex-1 font-typewriter text-sm mr-2 px-2 py-1',
+                            skill.level === 'none' ? 'text-red-600 font-bold' : '',
+                            skill.level === 'normal' ? 'text-gray-800' : '',
+                            skill.level === 'trained' ? 'text-green-700 font-bold' : '',
+                            skill.level === 'expert' ? 'text-blue-700 font-bold' : '',
+                            !skill.text ? 'text-gray-400 italic' : ''
+                          ]">
+                      {{ skill.text || '技能名稱' }}
+                    </span>
+                    <span :class="[
+                            'text-xs px-2 py-1 rounded border mr-2',
+                            skill.level === 'none' ? 'text-red-600 border-red-300 bg-red-50' : '',
+                            skill.level === 'normal' ? 'text-gray-600 border-gray-300 bg-gray-50' : '',
+                            skill.level === 'trained' ? 'text-green-700 border-green-300 bg-green-50' : '',
+                            skill.level === 'expert' ? 'text-blue-700 border-blue-300 bg-blue-50' : ''
+                          ]">
+                      {{ skill.level === 'none' ? '無能' : 
+                         skill.level === 'normal' ? '熟練' : 
+                         skill.level === 'trained' ? '受訓' : 
+                         skill.level === 'expert' ? '專精' : '熟練' }}
+                    </span>
+                  </template>
                 </div>
               </div>
             </div>
@@ -403,9 +459,9 @@
         </div>
 
         <!-- 右欄 - 密鑰與能力 -->
-        <div class="character-sheet-column">
+        <div class="character-sheet-column h-screen max-h-screen flex flex-col">
           <!-- 密鑰 -->
-          <div class="character-section mb-6">
+          <div class="character-section mb-6 flex-shrink-0">
             <div class="border-2 border-black bg-white p-4">
               <div class="flex items-center justify-between mb-4">
                 <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
@@ -422,6 +478,16 @@
                           ]">
                     隨機獲得
                   </button>
+                  <button @click="addNewCypher" 
+                          :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
+                          :class="[
+                            'text-xs px-2 py-1 rounded font-typewriter',
+                            character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
+                              ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                              : 'bg-green-700 text-white hover:bg-green-800'
+                          ]">
+                    + 添加密鑰
+                  </button>
                 </div>
               </div>
               
@@ -429,8 +495,11 @@
               <div class="space-y-2 max-h-96 overflow-y-auto">
                 <div v-for="(cypher, index) in character.cyphers" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
                   <div class="flex items-center justify-between mb-2">
-                    <input type="text" v-model="cypher.title" placeholder="密鑰名稱" 
-                           class="flex-1 font-bold text-sm bg-transparent border-b border-gray-400 focus:outline-none focus:border-black mr-2">
+                    <button @click="cypher.collapsed = !cypher.collapsed" 
+                            class="flex items-center text-sm font-medium text-gray-700 hover:text-black flex-1 text-left">
+                      <span class="mr-2">{{ cypher.collapsed ? '▶' : '▼' }}</span>
+                      <span>{{ getCypherTitle(cypher.content) || `密鑰 ${index + 1}` }}</span>
+                    </button>
                     <div class="flex items-center space-x-1">
                       <button @click="copyCypherToClipboard(cypher)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製密鑰詳細內容">
                         📋
@@ -440,37 +509,38 @@
                       </button>
                     </div>
                   </div>
-                  <div class="flex items-center mb-2">
-                    <span class="text-xs text-gray-600 mr-2">等級：</span>
-                    <input type="text" v-model="cypher.level" placeholder="1d6" 
-                           class="w-16 text-xs bg-transparent border-b border-gray-400 focus:outline-none focus:border-black">
+                  
+                  <div v-if="!cypher.collapsed">
+                    <textarea v-model="cypher.content" 
+                             placeholder="貼上完整密鑰內容，包含標題、等級和效果描述..." 
+                             class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
+                             rows="4"></textarea>
                   </div>
-                  <textarea v-model="cypher.content" placeholder="密鑰效果描述..." 
-                           class="w-full h-16 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black"
-                           rows="3"></textarea>
+                  
+                  <!-- 摺疊時顯示預覽 -->
+                  <div v-else-if="cypher.content" class="text-xs text-gray-600 italic truncate">
+                    {{ getCypherPreview(cypher.content) }}
+                  </div>
                 </div>
                 
-                <!-- 添加新密鑰按鈕 -->
-                <button @click="addNewCypher" 
-                        :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
-                        :class="[
-                          'w-full py-2 border-2 border-dashed rounded text-sm',
-                          character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
-                            ? 'border-gray-300 text-gray-400 cursor-not-allowed' 
-                            : 'border-gray-400 text-gray-600 hover:border-gray-600 hover:text-gray-800'
-                        ]">
-                  {{ character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
-                     ? `已達上限 (${character.cyphers.length}/${character.cypherLimit})` 
-                     : '+ 添加新密鑰' }}
-                </button>
+                <!-- 無密鑰時的提示 -->
+                <div v-if="character.cyphers.length === 0" class="text-center text-gray-500 text-sm py-4">
+                  尚未添加任何密鑰
+                </div>
+                
+                <!-- 密鑰上限提示 -->
+                <div v-if="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit" 
+                     class="text-center text-orange-600 text-xs py-2">
+                  已達密鑰上限 ({{ character.cyphers.length }}/{{ character.cypherLimit }})
+                </div>
               </div>
             </div>
           </div>
 
           <!-- 能力 -->
-          <div class="character-section">
-            <div class="border-2 border-black bg-white p-4 h-96 flex flex-col">
-              <div class="flex items-center justify-between mb-4">
+          <div class="character-section flex-1 min-h-0">
+            <div class="border-2 border-black bg-white p-4 h-full flex flex-col">
+              <div class="flex items-center justify-between mb-4 flex-shrink-0">
                 <div class="text-center text-sm font-bold uppercase tracking-wide">能力</div>
                 <button @click="addNewAbility" 
                         class="text-xs px-2 py-1 bg-green-700 text-white hover:bg-green-800 rounded font-typewriter">
@@ -479,7 +549,7 @@
               </div>
               
               <!-- 能力列表 -->
-              <div class="space-y-2 flex-1 overflow-y-auto">
+              <div class="space-y-2 flex-1 overflow-y-auto min-h-0">
                 <div v-for="(ability, index) in character.abilities" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
                   <div class="flex items-center justify-between mb-2">
                     <button @click="ability.collapsed = !ability.collapsed" 
@@ -561,7 +631,7 @@ const character = ref({
   supernaturalStressMarks: Array(10).fill(false),
   equipment: '',
   attacks: Array(4).fill(''),
-  skills: Array(15).fill(''),
+  skills: Array(15).fill(null).map(() => ({ text: '', level: 'normal', editing: false })),
   cyphers: [],
   cypherLimit: 0,
   abilities: [],
@@ -573,6 +643,9 @@ const character = ref({
 // 複製提示狀態
 const showCopyNotification = ref(false)
 const copyNotificationText = ref('')
+
+// 全域技能編輯狀態
+const allSkillsEditing = ref(false)
 
 // 顯示複製成功提示
 const showCopySuccess = (text) => {
@@ -592,9 +665,8 @@ const addNewCypher = () => {
   }
   
   character.value.cyphers.push({
-    title: '',
-    level: '',
-    content: ''
+    content: '',
+    collapsed: false
   })
 }
 
@@ -603,10 +675,7 @@ const removeCypher = (index) => {
 }
 
 const copyCypherToClipboard = async (cypher) => {
-  const cypherText = `${cypher.title}
-等級：${cypher.level}
-
-${cypher.content}`
+  const cypherText = cypher.content || '(空白密鑰)'
   
   try {
     await navigator.clipboard.writeText(cypherText)
@@ -628,6 +697,19 @@ ${cypher.content}`
   }
 }
 
+const getCypherJsonPath = () => {
+  // Nuxt 3/4: use useRuntimeConfig().app.baseURL if可用
+  // 但前端可用 window.location.pathname 判斷
+  const isDev = process.dev || window.location.hostname === 'localhost'
+  if (isDev) {
+    return '/data/cypher.json'
+  } else {
+    // 取得 base 路徑（假設部署在 /magnus-csr）
+    const base = window.location.pathname.split('/').filter(Boolean)[0] || ''
+    return `/${base}/data/cypher.json`
+  }
+}
+
 const generateRandomCyphers = async () => {
   const limit = character.value.cypherLimit || 0
   if (limit <= 0) {
@@ -635,20 +717,30 @@ const generateRandomCyphers = async () => {
     return
   }
   
+  // 計算需要補充的密鑰數量
+  const currentCount = character.value.cyphers.length
+  const needCount = limit - currentCount
+  
+  if (needCount <= 0) {
+    showCopySuccess('密鑰已達上限，無需補充')
+    return
+  }
+  
   try {
-    const response = await fetch('/data/cypher.json')
+    const cypherPath = getCypherJsonPath()
+    const response = await fetch(cypherPath)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
     const cypherData = await response.json()
     
-    // 清空現有密鑰
-    character.value.cyphers = []
-    
-    // 隨機選擇密鑰，數量等於密鑰上限
-    for (let i = 0; i < limit; i++) {
+    // 只補充缺少的密鑰，不清空現有的
+    for (let i = 0; i < needCount; i++) {
       const randomIndex = Math.floor(Math.random() * cypherData.length)
       const randomCypher = cypherData[randomIndex]
       
+      // 組合完整內容：標題 + 等級 + 效果
+      let content = randomCypher.title + '\n等級：' + randomCypher.level + '\n' + randomCypher.content
+      
       // 處理擲骰表格
-      let content = randomCypher.content
       if (randomCypher.roll_table) {
         content += '\n\n' + randomCypher.roll_table.map(item => 
           `${item.range}：${item.result}`
@@ -656,13 +748,12 @@ const generateRandomCyphers = async () => {
       }
       
       character.value.cyphers.push({
-        title: randomCypher.title,
-        level: randomCypher.level,
-        content: content
+        content: content,
+        collapsed: false
       })
     }
     
-    showCopySuccess(`成功生成 ${limit} 個隨機密鑰！`)
+    showCopySuccess(`成功補充 ${needCount} 個隨機密鑰！(${currentCount} → ${limit})`)
   } catch (error) {
     console.error('載入密鑰資料失敗:', error)
     showCopySuccess('載入密鑰資料失敗，請檢查檔案是否存在')
@@ -704,6 +795,34 @@ const copyAbilityToClipboard = async (ability) => {
   }
 }
 
+// 解析密鑰標題
+const getCypherTitle = (content) => {
+  if (!content) return null
+  
+  // 提取第一行作為標題
+  const firstLine = content.split('\n')[0].trim()
+  if (firstLine.length > 0 && firstLine.length <= 50) {
+    return firstLine
+  }
+  
+  return null
+}
+
+// 獲取密鑰預覽
+const getCypherPreview = (content) => {
+  if (!content) return ''
+  
+  // 跳過第一行（標題），顯示後面的內容
+  const lines = content.split('\n')
+  if (lines.length > 1) {
+    const preview = lines.slice(1).join(' ').trim()
+    return preview.length > 60 ? preview.substring(0, 60) + '...' : preview
+  }
+  
+  // 如果只有一行，顯示前60個字符
+  return content.length > 60 ? content.substring(0, 60) + '...' : content
+}
+
 // 解析能力標題
 const getAbilityTitle = (content) => {
   if (!content) return null
@@ -738,6 +857,21 @@ const getAbilityPreview = (content) => {
   return content.length > 50 ? content.substring(0, 50) + '...' : content
 }
 
+// 全域技能編輯切換函數
+const toggleAllSkillsEditing = () => {
+  allSkillsEditing.value = !allSkillsEditing.value
+  
+  // 確保所有技能都是正確的物件格式
+  character.value.skills = character.value.skills.map(skill => {
+    if (typeof skill === 'string') {
+      return { text: skill, level: 'normal', editing: allSkillsEditing.value }
+    } else if (skill && typeof skill === 'object') {
+      return { ...skill, editing: allSkillsEditing.value }
+    }
+    return { text: '', level: 'normal', editing: allSkillsEditing.value }
+  })
+}
+
 // 隱藏原生 title 工具提示
 onMounted(() => {
   // 頁面載入時自動載入儲存的資料
@@ -768,6 +902,9 @@ onMounted(() => {
 watch(character, () => {
   nextTick(() => {
     saveToLocalStorage()
+    // 同步全域編輯狀態
+    const editingSkills = character.value.skills.filter(skill => skill && skill.editing)
+    allSkillsEditing.value = editingSkills.length > 0 && editingSkills.length === character.value.skills.length
   })
 }, { deep: true })
 
@@ -801,7 +938,7 @@ const clearForm = () => {
       supernaturalStressMarks: Array(10).fill(false),
       equipment: '',
       attacks: Array(4).fill(''),
-      skills: Array(15).fill(''),
+      skills: Array(15).fill(null).map(() => ({ text: '', level: 'normal', editing: false })),
       cyphers: [],
       cypherLimit: 0,
       abilities: [],
@@ -828,6 +965,25 @@ const loadFromLocalStorage = () => {
     const savedData = localStorage.getItem('magnus-csr-character')
     if (savedData) {
       const parsedData = JSON.parse(savedData)
+      
+      // 先處理技能資料，確保格式正確
+      let processedSkills = Array(15).fill(null).map(() => ({ text: '', level: 'normal', editing: false }))
+      if (parsedData.skills && Array.isArray(parsedData.skills)) {
+        processedSkills = Array(15).fill(null).map((_, i) => {
+          const existing = parsedData.skills[i]
+          if (typeof existing === 'string') {
+            return { text: existing, level: 'normal', editing: false }
+          } else if (existing && typeof existing === 'object') {
+            return { 
+              text: existing.text || '', 
+              level: existing.level || 'normal', 
+              editing: false 
+            }
+          }
+          return { text: '', level: 'normal', editing: false }
+        })
+      }
+      
       // 確保所有必要的屬性都存在，並補充預設值
       character.value = {
         name: '',
@@ -852,22 +1008,20 @@ const loadFromLocalStorage = () => {
         supernaturalStressMarks: Array(10).fill(false),
         equipment: '',
         attacks: Array(4).fill(''),
-        skills: Array(15).fill(''),
+        skills: processedSkills, // 使用處理過的技能
         cyphers: [],
         cypherLimit: 0,
         abilities: [],
         xp: 0,
         background: '',
         recoveryBonus: 0,
-        ...parsedData // 覆蓋已儲存的資料
+        ...parsedData, // 覆蓋已儲存的資料
+        skills: processedSkills // 再次確保技能格式正確
       }
       
       // 確保陣列長度正確
       if (!character.value.attacks || character.value.attacks.length !== 4) {
         character.value.attacks = Array(4).fill('').map((_, i) => character.value.attacks?.[i] || '')
-      }
-      if (!character.value.skills || character.value.skills.length !== 15) {
-        character.value.skills = Array(15).fill('').map((_, i) => character.value.skills?.[i] || '')
       }
       if (!character.value.supernaturalStressMarks || character.value.supernaturalStressMarks.length !== 10) {
         character.value.supernaturalStressMarks = Array(10).fill(false).map((_, i) => character.value.supernaturalStressMarks?.[i] || false)
@@ -908,16 +1062,32 @@ const importFromJSON = (event) => {
     try {
       const importedData = JSON.parse(e.target.result)
       if (confirm('確定要匯入這個角色資料嗎？這將覆蓋目前的資料。')) {
+        // 先處理技能資料，確保格式正確
+        let processedSkills = Array(15).fill(null).map(() => ({ text: '', level: 'normal', editing: false }))
+        if (importedData.skills && Array.isArray(importedData.skills)) {
+          processedSkills = Array(15).fill(null).map((_, i) => {
+            const imported = importedData.skills[i]
+            if (typeof imported === 'string') {
+              return { text: imported, level: 'normal', editing: false }
+            } else if (imported && typeof imported === 'object') {
+              return { 
+                text: imported.text || '', 
+                level: imported.level || 'normal', 
+                editing: false 
+              }
+            }
+            return { text: '', level: 'normal', editing: false }
+          })
+        }
+        
         character.value = {
           ...character.value,
-          ...importedData
+          ...importedData,
+          skills: processedSkills // 確保技能格式正確
         }
         // 確保陣列長度正確
         if (!character.value.attacks || character.value.attacks.length !== 4) {
           character.value.attacks = Array(4).fill('').map((_, i) => importedData.attacks?.[i] || '')
-        }
-        if (!character.value.skills || character.value.skills.length !== 15) {
-          character.value.skills = Array(15).fill('').map((_, i) => importedData.skills?.[i] || '')
         }
         if (!character.value.supernaturalStressMarks || character.value.supernaturalStressMarks.length !== 10) {
           character.value.supernaturalStressMarks = Array(10).fill(false).map((_, i) => importedData.supernaturalStressMarks?.[i] || false)
@@ -940,7 +1110,7 @@ const exportToText = async () => {
   try {
     // 過濾非空的攻擊和技能
     const nonEmptyAttacks = character.value.attacks.filter(attack => attack.trim())
-    const nonEmptySkills = character.value.skills.filter(skill => skill.trim())
+    const nonEmptySkills = character.value.skills.filter(skill => skill.text && skill.text.trim())
     
     let textContent = `THE MAGNUS ARCHIVES - 角色卡
 ==========================================
@@ -972,13 +1142,19 @@ ${nonEmptyAttacks.length > 0 ?
 
 【技能】
 ${nonEmptySkills.length > 0 ? 
-  nonEmptySkills.map((skill, index) => `${index + 1}. ${skill}`).join('\n') : 
+  nonEmptySkills.map((skill, index) => {
+    const levelText = skill.level === 'none' ? '(無能)' : 
+                     skill.level === 'normal' ? '' : 
+                     skill.level === 'trained' ? '(受訓)' : 
+                     skill.level === 'expert' ? '(專精)' : ''
+    return `${index + 1}. ${skill.text}${levelText ? ' ' + levelText : ''}`
+  }).join('\n') : 
   '(無技能記錄)'}
 
 【密鑰】(上限：${character.value.cypherLimit})
 ${character.value.cyphers.length > 0 ? 
   character.value.cyphers.map((cypher, index) => 
-    `${index + 1}. ${cypher.title} (等級：${cypher.level})\n   ${cypher.content.replace(/\n/g, '\n   ')}`
+    `${index + 1}. ${cypher.content.replace(/\n/g, '\n   ')}`
   ).join('\n\n') : '(無密鑰)'}
 
 【能力】
@@ -1016,6 +1192,46 @@ ${character.value.equipment || '(無裝備記錄)'}
   } catch (error) {
     console.error('匯出失敗:', error)
     showCopySuccess('匯出失敗，請重試')
+  }
+}
+
+// 複製狀態值到剪貼簿
+const copyStatusToClipboard = async () => {
+  const statusText = `${character.value.name || '未命名角色'}
+
+【數值】
+位階：${character.value.tier}　努力：${character.value.effort}　XP：${character.value.xp}
+
+氣力　池：${character.value.might.pool}　節省值：${character.value.might.edge}　目前：${character.value.might.current}
+速度　池：${character.value.speed.pool}　節省值：${character.value.speed.edge}　目前：${character.value.speed.current}
+智力　池：${character.value.intellect.pool}　節省值：${character.value.intellect.edge}　目前：${character.value.intellect.current}
+
+【恢復骰】1d6+${character.value.recoveryBonus}
+動作：${character.value.recoveryRolls.action ? '✓' : '○'}　10分鐘：${character.value.recoveryRolls.tenMin ? '✓' : '○'}　1小時：${character.value.recoveryRolls.oneHour ? '✓' : '○'}　10小時：${character.value.recoveryRolls.tenHours ? '✓' : '○'}
+
+【狀態軌】
+傷害軌：${getTrackDisplayName(character.value.damageTrack, 'damage')}
+理智軌：${getTrackDisplayName(character.value.sanityTrack, 'sanity')}
+壓力：${character.value.currentStress}　壓力量級：${character.value.stressLevel}
+超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10`
+
+  try {
+    await navigator.clipboard.writeText(statusText)
+    showCopySuccess('狀態值已複製到剪貼簿！')
+  } catch (error) {
+    console.error('複製失敗:', error)
+    // 降級處理
+    const textArea = document.createElement('textarea')
+    textArea.value = statusText
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      showCopySuccess('狀態值已複製到剪貼簿！')
+    } catch (fallbackError) {
+      showCopySuccess('複製失敗，請重試')
+    }
+    document.body.removeChild(textArea)
   }
 }
 
@@ -1077,6 +1293,96 @@ textarea:focus {
 h1, h2 {
   color: #2d5a2d;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 下拉選單樣式 */
+select {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  background-color: #faf9f7;
+  transition: all 0.2s ease;
+}
+
+select:focus {
+  background-color: rgba(161, 60, 60, 0.05);
+  border-color: #a13c3c;
+}
+
+select option {
+  background-color: #faf9f7;
+  color: inherit;
+}
+
+/* 技能顏色樣式 - 使用 !important 確保優先級 */
+.text-red-600 {
+  color: #dc2626 !important;
+}
+
+.text-green-700 {
+  color: #15803d !important;
+}
+
+.text-blue-700 {
+  color: #1d4ed8 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* 技能項目懸浮效果 */
+.cursor-pointer:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transition: background-color 0.2s ease;
+}
+
+/* 編輯狀態樣式 */
+.bg-yellow-50 {
+  background-color: #fefce8;
+}
+
+.border-yellow-300 {
+  border-color: #fde047;
+}
+
+/* 技能等級標籤樣式 */
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.border-red-300 {
+  border-color: #fca5a5;
+}
+
+.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+.border-green-300 {
+  border-color: #86efac;
+}
+
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.border-blue-300 {
+  border-color: #93c5fd;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.text-gray-600 {
+  color: #4b5563;
 }
 
 /* 復古表格樣式 */
