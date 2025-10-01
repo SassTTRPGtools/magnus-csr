@@ -303,19 +303,27 @@
                 </label>
                 <label class="flex items-center">
                   <input type="checkbox" class="mr-2">
-                  <span>邁向完美：將選擇氣力、速度或智力一項 +1。</span>
+                  <span>邁向完美：選擇一項氣力、速度或智力節省值 +1。</span>
                 </label>
                 <label class="flex items-center">
                   <input type="checkbox" class="mr-2">
-                  <span>額外努力：將努力值 +1。</span>
+                  <span>額外努力：努力值 +1。</span>
                 </label>
                 <label class="flex items-center">
                   <input type="checkbox" class="mr-2">
-                  <span>技能：選擇一項新技能（攻擊與防禦除外）受訓。 或者將受訓技能改為專精。</span>
+                  <span>技能：學習一項新技能。</span>
                 </label>
                 <label class="flex items-center">
                   <input type="checkbox" class="mr-2">
-                  <span>其他選項：見規則書。</span>
+                  <span>精進自我：密鑰上限+1。（上限5）</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" class="mr-2">
+                  <span>更多乘載：物品欄+2。</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" class="mr-2">
+                  <span>處驚不亂：恢復骰結果+2。</span>
                 </label>
               </div>
             </div>
@@ -351,7 +359,7 @@
           </div>
         </div>
 
-        <!-- 中欄 - 標題、技能與攻擊 -->
+        <!-- 中欄 - 標題與物品欄 -->
         <div class="character-sheet-column">
           <!-- 標題 -->
           <div class="text-center mb-8 p-6 border border-green-400 bg-black bg-opacity-90">
@@ -365,6 +373,203 @@
               <span class="text-green-500 animate-ping">_</span>
             </div>
             <div class="mt-2 text-xs text-green-600 tracking-wider">SECURITY CLEARANCE: AUTHORIZED</div>
+          </div>
+
+          <!-- 物品欄 -->
+          <div class="mb-6">
+            <div class="border border-green-400 bg-black bg-opacity-80 p-4 h-[600px] flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
+                  <span class="text-green-500">></span> <span class="ml-1">物品欄</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="flex items-center space-x-1">
+                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
+                    <input type="number" v-model.number="character.inventoryLimit" min="7" 
+                           class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" 
+                           placeholder="0">
+                  </div>
+                  <button @click="toggleInventoryEditMode" 
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            'bg-blue-900 text-blue-100 border-blue-400 hover:bg-blue-800 hover:shadow-lg hover:shadow-blue-400/30'
+                          ]">
+                    {{ inventoryEditMode ? '[VIEW]' : '[EDIT]' }}
+                  </button>
+                  <button @click="addNewItem" 
+                          v-if="inventoryEditMode"
+                          :disabled="character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit"
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit 
+                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
+                              : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
+                          ]">
+                    [+ADD]
+                  </button>
+                </div>
+              </div>
+              
+              <!-- 編輯模式 -->
+              <div v-if="inventoryEditMode" class="space-y-2 flex-1 overflow-y-auto">
+                <div v-for="(item, index) in (character.inventory || [])" :key="index" 
+                     class="border border-green-600 bg-green-900 bg-opacity-20 p-3 hover:bg-green-900 hover:bg-opacity-30 transition-all duration-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <button @click="item.collapsed = !item.collapsed" 
+                            class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
+                      <span class="mr-2 text-green-500">{{ item.collapsed ? '>' : 'v' }}</span>
+                      <span>{{ getItemTitle(item.content) || `ITEM_${String(index + 1).padStart(2, '0')}` }}</span>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                      <button @click="copyItemToClipboard(item)" 
+                              class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" 
+                              title="Copy item data">
+                        [CPY]
+                      </button>
+                      <button @click="removeItem(index)" 
+                              class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
+                        [DEL]
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div v-if="!item.collapsed">
+                    <textarea v-model="item.content" 
+                             placeholder="物品名稱 | 價格&#10;物品描述..." 
+                             class="w-full h-24 text-xs bg-transparent border border-green-600 text-green-100 placeholder-green-400 font-mono p-2 resize-none focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20"
+                             rows="4"></textarea>
+                  </div>
+                  
+                  <!-- 摺疊時顯示預覽 -->
+                  <div v-else-if="item.content" class="text-xs text-green-400 italic truncate font-mono">
+                    {{ getItemPreview(item.content) }}
+                  </div>
+                </div>
+                
+                <!-- 無物品時的提示 -->
+                <div v-if="!character.inventory || character.inventory.length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
+                  > NO.ITEMS.LOADED
+                </div>
+                
+                <!-- 物品上限提示 -->
+                <div v-if="character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit" 
+                     class="text-center text-yellow-600 text-xs py-2 border border-yellow-400 bg-yellow-900 bg-opacity-20 font-mono">
+                  已達物品上限 ({{ character.inventory ? character.inventory.length : 0 }}/{{ character.inventoryLimit }})
+                </div>
+              </div>
+              
+              <!-- 查看模式 -->
+              <div v-else class="space-y-4 flex-1 overflow-y-auto">
+                <div v-for="(category, categoryName) in categorizedItems" :key="categoryName" class="mb-4">
+                  <h3 class="text-green-400 font-mono text-sm font-bold mb-2 border-b border-green-600 pb-1">
+                    {{ categoryName }}
+                  </h3>
+                  <div class="grid grid-cols-1 gap-2">
+                    <div v-for="(item, index) in category" :key="index" 
+                         class="bg-green-900 bg-opacity-10 border border-green-600 p-2 hover:bg-green-900 hover:bg-opacity-20 transition-all duration-200 cursor-help"
+                         :title="getItemTooltip(item)">
+                      <div class="flex items-center justify-between">
+                        <span class="font-mono text-green-100 text-sm">{{ item.name }}</span>
+                        <span class="font-mono text-yellow-400 text-xs">{{ item.price }}</span>
+                      </div>
+                      <div class="text-green-400 text-xs font-mono mt-1 opacity-80">
+                        {{ item.description.length > 60 ? item.description.substring(0, 60) + '...' : item.description }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 無物品時的提示 -->
+                <div v-if="Object.keys(categorizedItems).length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
+                  > NO.ITEMS.LOADED
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 右欄 - 密鑰與技能 -->
+        <div class="character-sheet-column">
+          <!-- 密鑰 -->
+          <div class="mb-6">
+            <div class="border border-green-400 bg-black bg-opacity-80 p-4 h-[400px] flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
+                  <span class="text-green-500">></span> <span class="ml-1">密鑰</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="flex items-center space-x-1">
+                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
+                    <input type="number" v-model.number="character.cypherLimit" min="0" class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" placeholder="0">
+                  </div>
+                  <button @click="generateRandomCyphers" 
+                          :disabled="character.cypherLimit <= 0"
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            character.cypherLimit <= 0 
+                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
+                              : 'bg-yellow-900 text-yellow-100 border-yellow-400 hover:bg-yellow-800 hover:shadow-lg hover:shadow-yellow-400/30'
+                          ]">
+                    [RNG]
+                  </button>
+                  <button @click="addNewCypher" 
+                          :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
+                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
+                              : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
+                          ]">
+                    [+ADD]
+                  </button>
+                </div>
+              </div>
+              
+              <!-- 密鑰列表 -->
+              <div class="space-y-2 flex-1 overflow-y-auto">
+                <div v-for="(cypher, index) in character.cyphers" :key="index" class="border border-green-600 bg-green-900 bg-opacity-20 p-3 hover:bg-green-900 hover:bg-opacity-30 transition-all duration-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <button @click="cypher.collapsed = !cypher.collapsed" 
+                            class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
+                      <span class="mr-2 text-green-500">{{ cypher.collapsed ? '>' : 'v' }}</span>
+                      <span>{{ getCypherTitle(cypher.content) || `CYPHER_${String(index + 1).padStart(2, '0')}` }}</span>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                      <button @click="copyCypherToClipboard(cypher)" class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" title="Copy cypher data">
+                        [CPY]
+                      </button>
+                      <button @click="removeCypher(index)" class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
+                        [DEL]
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div v-if="!cypher.collapsed">
+                    <textarea v-model="cypher.content" 
+                             placeholder="貼上完整密鑰內容，包含標題、等級和效果描述..." 
+                             class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
+                             rows="4"></textarea>
+                  </div>
+                  
+                  <!-- 摺疊時顯示預覽 -->
+                  <div v-else-if="cypher.content" class="text-xs text-gray-600 italic truncate">
+                    {{ getCypherPreview(cypher.content) }}
+                  </div>
+                </div>
+                
+                <!-- 無密鑰時的提示 -->
+                <div v-if="character.cyphers.length === 0" class="text-center text-gray-500 text-sm py-4">
+                  尚未添加任何密鑰
+                </div>
+                
+                <!-- 密鑰上限提示 -->
+                <div v-if="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit" 
+                     class="text-center text-orange-600 text-xs py-2">
+                  已達密鑰上限 ({{ character.cyphers.length }}/{{ character.cypherLimit }})
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- 已學習技能 -->
@@ -414,203 +619,6 @@
                 </div>
               </div>
              
-            </div>
-          </div>
-
-        </div>
-
-        <!-- 右欄 - 密鑰 -->
-        <div class="character-sheet-column">
-          <!-- 密鑰 -->
-          <div class="mb-6">
-            <div class="border border-green-400 bg-black bg-opacity-80 p-4">
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
-                  <span class="text-green-500">></span> <span class="ml-1">密鑰</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <div class="flex items-center space-x-1">
-                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
-                    <input type="number" v-model.number="character.cypherLimit" min="0" class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" placeholder="0">
-                  </div>
-                  <button @click="generateRandomCyphers" 
-                          :disabled="character.cypherLimit <= 0"
-                          :class="[
-                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
-                            character.cypherLimit <= 0 
-                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
-                              : 'bg-yellow-900 text-yellow-100 border-yellow-400 hover:bg-yellow-800 hover:shadow-lg hover:shadow-yellow-400/30'
-                          ]">
-                    [RNG]
-                  </button>
-                  <button @click="addNewCypher" 
-                          :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
-                          :class="[
-                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
-                            character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
-                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
-                              : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
-                          ]">
-                    [+ADD]
-                  </button>
-                </div>
-              </div>
-              
-              <!-- 密鑰列表 -->
-              <div class="space-y-2 max-h-96 overflow-y-auto">
-                <div v-for="(cypher, index) in character.cyphers" :key="index" class="border border-green-600 bg-green-900 bg-opacity-20 p-3 hover:bg-green-900 hover:bg-opacity-30 transition-all duration-200">
-                  <div class="flex items-center justify-between mb-2">
-                    <button @click="cypher.collapsed = !cypher.collapsed" 
-                            class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
-                      <span class="mr-2 text-green-500">{{ cypher.collapsed ? '>' : 'v' }}</span>
-                      <span>{{ getCypherTitle(cypher.content) || `CYPHER_${String(index + 1).padStart(2, '0')}` }}</span>
-                    </button>
-                    <div class="flex items-center space-x-2">
-                      <button @click="copyCypherToClipboard(cypher)" class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" title="Copy cypher data">
-                        [CPY]
-                      </button>
-                      <button @click="removeCypher(index)" class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
-                        [DEL]
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div v-if="!cypher.collapsed">
-                    <textarea v-model="cypher.content" 
-                             placeholder="貼上完整密鑰內容，包含標題、等級和效果描述..." 
-                             class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
-                             rows="4"></textarea>
-                  </div>
-                  
-                  <!-- 摺疊時顯示預覽 -->
-                  <div v-else-if="cypher.content" class="text-xs text-gray-600 italic truncate">
-                    {{ getCypherPreview(cypher.content) }}
-                  </div>
-                </div>
-                
-                <!-- 無密鑰時的提示 -->
-                <div v-if="character.cyphers.length === 0" class="text-center text-gray-500 text-sm py-4">
-                  尚未添加任何密鑰
-                </div>
-                
-                <!-- 密鑰上限提示 -->
-                <div v-if="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit" 
-                     class="text-center text-orange-600 text-xs py-2">
-                  已達密鑰上限 ({{ character.cyphers.length }}/{{ character.cypherLimit }})
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 物品欄 -->
-          <div class="mb-6">
-            <div class="border border-green-400 bg-black bg-opacity-80 p-4">
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
-                  <span class="text-green-500">></span> <span class="ml-1">物品欄</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <div class="flex items-center space-x-1">
-                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
-                    <input type="number" v-model.number="character.inventoryLimit" min="0" 
-                           class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" 
-                           placeholder="0">
-                  </div>
-                  <button @click="toggleInventoryEditMode" 
-                          :class="[
-                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
-                            'bg-blue-900 text-blue-100 border-blue-400 hover:bg-blue-800 hover:shadow-lg hover:shadow-blue-400/30'
-                          ]">
-                    {{ inventoryEditMode ? '[VIEW]' : '[EDIT]' }}
-                  </button>
-                  <button @click="addNewItem" 
-                          v-if="inventoryEditMode"
-                          :disabled="character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit"
-                          :class="[
-                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
-                            character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit 
-                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
-                              : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
-                          ]">
-                    [+ADD]
-                  </button>
-                </div>
-              </div>
-              
-              <!-- 編輯模式 -->
-              <div v-if="inventoryEditMode" class="space-y-2 max-h-96 overflow-y-auto">
-                <div v-for="(item, index) in (character.inventory || [])" :key="index" 
-                     class="border border-green-600 bg-green-900 bg-opacity-20 p-3 hover:bg-green-900 hover:bg-opacity-30 transition-all duration-200">
-                  <div class="flex items-center justify-between mb-2">
-                    <button @click="item.collapsed = !item.collapsed" 
-                            class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
-                      <span class="mr-2 text-green-500">{{ item.collapsed ? '>' : 'v' }}</span>
-                      <span>{{ getItemTitle(item.content) || `ITEM_${String(index + 1).padStart(2, '0')}` }}</span>
-                    </button>
-                    <div class="flex items-center space-x-2">
-                      <button @click="copyItemToClipboard(item)" 
-                              class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" 
-                              title="Copy item data">
-                        [CPY]
-                      </button>
-                      <button @click="removeItem(index)" 
-                              class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
-                        [DEL]
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div v-if="!item.collapsed">
-                    <textarea v-model="item.content" 
-                             placeholder="物品名稱 | 價格&#10;物品描述..." 
-                             class="w-full h-24 text-xs bg-transparent border border-green-600 text-green-100 placeholder-green-400 font-mono p-2 resize-none focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20"
-                             rows="4"></textarea>
-                  </div>
-                  
-                  <!-- 摺疊時顯示預覽 -->
-                  <div v-else-if="item.content" class="text-xs text-green-400 italic truncate font-mono">
-                    {{ getItemPreview(item.content) }}
-                  </div>
-                </div>
-                
-                <!-- 無物品時的提示 -->
-                <div v-if="!character.inventory || character.inventory.length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
-                  > NO.ITEMS.LOADED
-                </div>
-                
-                <!-- 物品上限提示 -->
-                <div v-if="character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit" 
-                     class="text-center text-yellow-600 text-xs py-2 border border-yellow-400 bg-yellow-900 bg-opacity-20 font-mono">
-                  已達物品上限 ({{ character.inventory ? character.inventory.length : 0 }}/{{ character.inventoryLimit }})
-                </div>
-              </div>
-              
-              <!-- 查看模式 -->
-              <div v-else class="space-y-4 max-h-96 overflow-y-auto">
-                <div v-for="(category, categoryName) in categorizedItems" :key="categoryName" class="mb-4">
-                  <h3 class="text-green-400 font-mono text-sm font-bold mb-2 border-b border-green-600 pb-1">
-                    {{ categoryName }}
-                  </h3>
-                  <div class="grid grid-cols-1 gap-2">
-                    <div v-for="(item, index) in category" :key="index" 
-                         class="bg-green-900 bg-opacity-10 border border-green-600 p-2 hover:bg-green-900 hover:bg-opacity-20 transition-all duration-200 cursor-help"
-                         :title="getItemTooltip(item)">
-                      <div class="flex items-center justify-between">
-                        <span class="font-mono text-green-100 text-sm">{{ item.name }}</span>
-                        <span class="font-mono text-yellow-400 text-xs">{{ item.price }}</span>
-                      </div>
-                      <div class="text-green-400 text-xs font-mono mt-1 opacity-80">
-                        {{ item.description.length > 60 ? item.description.substring(0, 60) + '...' : item.description }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- 無物品時的提示 -->
-                <div v-if="Object.keys(categorizedItems).length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
-                  > NO.ITEMS.LOADED
-                </div>
-              </div>
             </div>
           </div>
 
@@ -797,7 +805,7 @@ const character = ref({
   cyphers: [],
   cypherLimit: 0,
   inventory: [],
-  inventoryLimit: 0,
+  inventoryLimit: 7,
   selectedSkills: [],
   xp: 0,
   background: '',
@@ -1454,6 +1462,10 @@ const clearForm = () => {
       cyphers: [],
       cypherLimit: 0,
       selectedSkills: [],
+      cyphers: [],
+      cypherLimit: 0,
+      inventory: [],
+      inventoryLimit: 7,
       xp: 0,
       background: '',
       recoveryBonus: 0,
@@ -1542,7 +1554,7 @@ const loadFromLocalStorage = () => {
         cyphers: [],
         cypherLimit: 0,
         inventory: [],
-        inventoryLimit: 0,
+        inventoryLimit: 7,
         selectedSkills: [],
         xp: 0,
         background: '',
@@ -1551,7 +1563,7 @@ const loadFromLocalStorage = () => {
         ...parsedData, // 覆蓋已儲存的資料
         selectedSkills: parsedData.selectedSkills || [], // 確保技能選擇格式正確
         inventory: parsedData.inventory || [], // 確保物品欄格式正確
-        inventoryLimit: parsedData.inventoryLimit || 0 // 確保物品上限格式正確
+        inventoryLimit: parsedData.inventoryLimit || 7 // 確保物品上限格式正確
       }
       
       // 確保陣列長度正確
