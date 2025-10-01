@@ -749,19 +749,19 @@ const character = ref({
   tier: 1,
   effort: 1,
   might: {
-    pool: 0,
+    pool: 10,
     edge: 0,
-    current: 0
+    current: 10
   },
   speed: {
-    pool: 0,
+    pool: 10,
     edge: 0,
-    current: 0
+    current: 10
   },
   intellect: {
-    pool: 0,
+    pool: 10,
     edge: 0,
-    current: 0
+    current: 10
   },
   recoveryRolls: {
     action: [
@@ -780,8 +780,8 @@ const character = ref({
       { used: false }
     ]
   },
-  currentStress: 0,
-  stressMin: 0,
+  currentStress: 2,
+  stressMin: 2,
   wounds: [
     // 預設 3 個輕度傷勢格
     { severity: 'light', checked: false },
