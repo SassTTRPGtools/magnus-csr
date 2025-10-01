@@ -375,6 +375,73 @@
             <div class="mt-2 text-xs text-green-600 tracking-wider">SECURITY CLEARANCE: AUTHORIZED</div>
           </div>
 
+          <!-- 創傷系統 -->
+          <div class="mb-6">
+            <div class="border border-red-400 bg-black bg-opacity-80 p-4">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                  <select v-model="selectedTraumaType" class="text-xs px-2 py-1 bg-black text-red-100 border border-red-400 font-mono focus:outline-none focus:border-yellow-400">
+                    <option value="">選擇創傷類型</option>
+                    <option value="blunt">鈍擊</option>
+                    <option value="bleeding">出血</option>
+                    <option value="gunshot">槍擊</option>
+                    <option value="fire">火焰&爆炸</option>
+                    <option value="grotesque">猙獰&龐大</option>
+                  </select>
+                  <button @click="sufferTrauma" 
+                          :disabled="!selectedTraumaType"
+                          :class="[
+                            'text-xs px-3 py-1 border font-mono transition-all duration-200',
+                            !selectedTraumaType 
+                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
+                              : 'bg-red-900 text-red-100 border-red-400 hover:bg-red-800 hover:shadow-lg hover:shadow-red-400/30'
+                          ]">
+                    [承受創傷]
+                  </button>
+                  <button @click="clearAllTraumas" 
+                          :disabled="!character.traumas || character.traumas.length === 0"
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            !character.traumas || character.traumas.length === 0 
+                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
+                              : 'bg-orange-900 text-orange-100 border-orange-400 hover:bg-orange-800 hover:shadow-lg hover:shadow-orange-400/30'
+                          ]">
+                    [清除]
+                  </button>
+                </div>
+              </div>
+              
+              <!-- 創傷列表 -->
+              <div class="space-y-2 max-h-48 overflow-y-auto">
+                <div v-for="(trauma, index) in (character.traumas || [])" :key="index" 
+                     class="border border-red-600 bg-red-900 bg-opacity-20 p-3 hover:bg-red-900 hover:bg-opacity-30 transition-all duration-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-red-300 text-xs font-mono bg-red-900 px-2 py-1 border border-red-500">[{{ getTraumaTypeLabel(trauma.type) }}]</span>
+                      <span class="text-red-100 text-sm font-mono">D10: {{ trauma.roll }}</span>
+                    </div>
+                    <button @click="removeTrauma(index)" 
+                            class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
+                      [DEL]
+                    </button>
+                  </div>
+                  
+                  <!-- 創傷效果顯示 -->
+                  <div class="text-red-200 text-xs font-mono leading-relaxed">
+                    <div class="font-bold mb-1 text-red-100">{{ trauma.severity }}</div>
+                    <div class="text-red-300 opacity-90">{{ trauma.description }}</div>
+                  </div>
+                </div>
+                
+                <!-- 無創傷時的提示 -->
+                <div v-if="!character.traumas || character.traumas.length === 0" 
+                     class="text-center text-red-500 font-mono text-xs p-4 border border-red-600 bg-black bg-opacity-50">
+                  > NO.TRAUMA.RECORDED
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 物品欄 -->
           <div class="mb-6">
             <div class="border border-green-400 bg-black bg-opacity-80 p-4 h-[600px] flex flex-col">
@@ -807,6 +874,7 @@ const character = ref({
   inventory: [],
   inventoryLimit: 7,
   selectedSkills: [],
+  traumas: [],
   xp: 0,
   background: '',
   recoveryBonus: 0,
@@ -827,6 +895,9 @@ const terminalConfirmCallback = ref(null)
 
 // 物品欄編輯模式
 const inventoryEditMode = ref(false)
+
+// 創傷系統
+const selectedTraumaType = ref('')
 
 // 技能樹資料
 const basicSkills = ref([
@@ -1213,6 +1284,128 @@ const categorizedItems = computed(() => {
 
 const getItemTooltip = (item) => {
   return `${item.name}\n價格: ${item.price}\n\n${item.description}`
+}
+
+// 創傷系統相關函數
+const traumaTable = {
+  blunt: [
+    { severity: '皮肉損傷', description: '倒地' },                           // 0
+    { severity: '輕度創傷', description: '氣喘吁吁，順過氣前行動－１' },     // 1
+    { severity: '輕度創傷', description: '腳踝扭傷，速度檢定－１' },         // 2
+    { severity: '輕度創傷', description: '腦震盪，智力檢定－１' },           // 3
+    { severity: '輕度創傷', description: '腿部或是腳折斷，速度檢定－１' },   // 4
+    { severity: '重度創傷', description: '臂部或是手折斷，動作類任務－１' }, // 5
+    { severity: '重度創傷', description: '鎖骨折斷，氣力檢定－１' },         // 6
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '背部折斷，所有檢定－１' }, // 7
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '顱骨開裂，所有檢定－１' }, // 8
+    { severity: '致命創傷（死亡豁免）', description: '脊椎或膝子折斷，死亡豁免' }       // 9
+  ],
+  bleeding: [
+    { severity: '皮肉損傷', description: '持有物品掉落' },                         // 0
+    { severity: '輕度創傷', description: '失血，近距人員，獲得 1 壓力' },          // 1
+    { severity: '輕度創傷', description: '血染眼睛，擦乾前行動－１' },              // 2
+    { severity: '輕度創傷', description: '撕裂傷，每輪輕度出血' },                  // 3
+    { severity: '輕度創傷', description: '重度割傷，每輪輕度出血' },                // 4
+    { severity: '重度創傷', description: '手指/腳趾砍落，每輪輕度出血' },            // 5
+    { severity: '重度創傷', description: '手/腳砍落，每輪輕度出血' },                // 6
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '肢體砍落，每輪重度出血' }, // 7
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '主動脈割傷，每輪重度出血' }, // 8
+    { severity: '致命創傷（死亡豁免）', description: '喉嚨割開或心臟刺穿，死亡豁免' }     // 9
+  ],
+  gunshot: [
+    { severity: '皮肉損傷', description: '擦傷、擊倒' },                  // 0
+    { severity: '輕度創傷', description: '每輪輕度出血' },                // 1
+    { severity: '輕度創傷', description: '肋骨折斷' },                    // 2
+    { severity: '輕度創傷', description: '肢體斷裂' },                    // 3
+    { severity: '輕度創傷', description: '內出血，每輪輕度出血' },        // 4
+    { severity: '重度創傷', description: '子彈嵌入，需要手術' },          // 5
+    { severity: '重度創傷', description: '頸頸中槍' },                    // 6
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '重度失血，每輪輕度出血' },   // 7
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '穿洞性胸部損傷，每輪重度出血' }, // 8
+    { severity: '致命創傷（死亡豁免）', description: '頭部中槍，死亡豁免' }            // 9
+  ],
+  fire: [
+    { severity: '皮肉損傷', description: '頭髮燃燒，獲得 1d5 壓力' },                          // 0
+    { severity: '輕度創傷', description: '可怕傷痕，壓力下限 +1' },                            // 1
+    { severity: '輕度創傷', description: '燒焦，下次行動－１' },                              // 2
+    { severity: '輕度創傷', description: '彈片傷/大面積燒傷' },                               // 3
+    { severity: '輕度創傷', description: '3 級燒傷' },                                        // 4
+    { severity: '重度創傷', description: '重度燒傷，速度檢定－１' },                           // 5
+    { severity: '重度創傷', description: '需要植皮，速度檢定－１' },                           // 6
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '肢體著火，每輪1D10。1-5 輕度；6-8 重度；9-10 嚴重' }, // 7
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '身體著火，每輪1D10。1-3 輕度；4-7 重度；8-10 嚴重' }, // 8
+    { severity: '致命創傷（死亡豁免）', description: '裹滿熊熊烈焰，死亡豁免' }                    // 9
+  ],
+  grotesque: [
+    { severity: '皮肉損傷', description: '嘔吐，下次行動－１' },                  // 0
+    { severity: '輕度創傷', description: '可怕傷痕，壓力下限 +1' },              // 1
+    { severity: '輕度創傷', description: '指部損毀' },                          // 2
+    { severity: '輕度創傷', description: '眼睛挖出' },                          // 3
+    { severity: '輕度創傷', description: '血肉撕落，氣力檢定－１' },             // 4
+    { severity: '重度創傷', description: '腰部以下癱瘓' },                       // 5
+    { severity: '重度創傷', description: '肢體砍落，每輪重度出血' },             // 6
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '穿刺，每輪重度出血' },  // 7
+    { severity: '致命創傷（1d10 輪內死亡豁免）', description: '腸脹滿地，每輪重度出血' }, // 8
+    { severity: '致命創傷（死亡豁免）', description: '頭部爆炸，你直接死去。' }          // 9
+  ]
+}
+
+const getTraumaTypeLabel = (type) => {
+  const labels = {
+    'blunt': '鈍擊',
+    'bleeding': '出血', 
+    'gunshot': '槍擊',
+    'fire': '火焰&爆炸',
+    'grotesque': '猙獰&龐大'
+  }
+  return labels[type] || type
+}
+
+const sufferTrauma = () => {
+  if (!selectedTraumaType.value) return
+  
+  const roll = Math.floor(Math.random() * 10)
+  const traumaData = traumaTable[selectedTraumaType.value][roll]
+  const traumaTypeLabel = getTraumaTypeLabel(selectedTraumaType.value)
+  
+  const newTrauma = {
+    type: selectedTraumaType.value,
+    roll: roll,
+    severity: traumaData.severity,
+    description: traumaData.description,
+    timestamp: new Date().getTime()
+  }
+  
+  // 確保 traumas 陣列存在
+  if (!character.value.traumas) {
+    character.value.traumas = []
+  }
+  
+  character.value.traumas.push(newTrauma)
+  selectedTraumaType.value = ''
+  showCopySuccess(`承受創傷！D10骰出 ${roll}，類型：${traumaTypeLabel}`)
+}
+
+const removeTrauma = (index) => {
+  if (character.value.traumas && Array.isArray(character.value.traumas)) {
+    character.value.traumas.splice(index, 1)
+  }
+}
+
+const clearAllTraumas = () => {
+  // 確保 traumas 陣列存在
+  if (!character.value.traumas) {
+    character.value.traumas = []
+    return
+  }
+  
+  showTerminalConfirm.value = true
+  terminalConfirmMessage.value = `> CONFIRM_DELETE_ALL_TRAUMAS\n> TRAUMA_COUNT: ${character.value.traumas.length}\n> WARNING: OPERATION_IRREVERSIBLE\n> PROCEED? [Y/N]`
+  terminalConfirmCallback.value = () => {
+    character.value.traumas = []
+    showCopySuccess('> ALL_TRAUMAS_CLEARED')
+    closeTerminalConfirm()
+  }
 }
 
 // 恢復動作相關函數
