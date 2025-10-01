@@ -493,8 +493,6 @@
                      class="skill-node cursor-pointer" 
                      :class="{ 
                        'skill-selected': isSkillSelected(skill.id),
-                       'has-connection': hasConnection(skill.id),
-                       'connection-active': hasActiveConnection(skill.id)
                      }"
                      @click="toggleSkill(skill.id)">
                   <div class="skill-circle">
@@ -511,9 +509,7 @@
                      class="skill-node cursor-pointer" 
                      :class="{ 
                        'skill-selected': isSkillSelected(skill.id),
-                       'skill-disabled': !canSelectSkill(skill.id),
-                       'has-connection': hasConnection(skill.id),
-                       'connection-active': hasActiveConnection(skill.id)
+                       'skill-disabled': !canSelectSkill(skill.id)
                      }"
                      :title="getSkillTooltip(skill)"
                      @click="toggleSkill(skill.id)">
@@ -654,7 +650,7 @@ const basicSkills = ref([
   { id: 'industrialEquipment', name: '工業裝備' },
   { id: 'firstAid', name: '應急裝配' },
   { id: 'chemistry', name: '化學' },
-  { id: 'computers', name: '電腦' },
+  { id: 'computers', name: '終端機' },
   { id: 'zerogy', name: '零重力' },
   { id: 'mathematics', name: '數學' },
   { id: 'art', name: '藝術' },
@@ -666,65 +662,38 @@ const basicSkills = ref([
 ])
 
 const intermediateSkills = ref([
-  { id: 'psychology', name: '心理學', prereq: ['linguistics'] },
-  { id: 'pathology', name: '病理學', prereq: ['biology'] },
-  { id: 'fieldMedicine', name: '戰地醫學', prereq: ['botany'] },
-  { id: 'ecology', name: '生態學', prereq: ['botany'] },
-  { id: 'asteroid', name: '小行星礦', prereq: ['geology'] },
-  { id: 'mechanics', name: '機械修理', prereq: ['industrialEquipment'] },
-  { id: 'explosives', name: '炸藥', prereq: ['firstAid', 'chemistry'] },
+  { id: 'psychology', name: '心理學', prereq: ['linguistics','biology','botany'] },
+  { id: 'pathology', name: '病理學', prereq: ['biology','botany'] },
+  { id: 'fieldMedicine', name: '戰地醫學', prereq: ['botany','biology'] },
+  { id: 'ecology', name: '生態學', prereq: ['botany','geology'] },
+  { id: 'asteroid', name: '小行星採礦', prereq: ['geology','industrialEquipment'] },
+  { id: 'mechanics', name: '機械修理', prereq: ['industrialEquipment','firstAid'] },
+  { id: 'explosives', name: '炸藥', prereq: ['firstAid', 'chemistry','militaryTraining'] },
   { id: 'pharmacology', name: '藥理學', prereq: ['chemistry'] },
   { id: 'hacking', name: '駭客', prereq: ['computers'] },
   { id: 'piloting', name: '駕駛', prereq: ['zerogy'] },
   { id: 'physics', name: '物理學', prereq: ['mathematics'] },
   { id: 'mysticism', name: '神祕學', prereq: ['art', 'archaeology', 'theology'] },
-  { id: 'survival', name: '野外求生', prereq: ['archaeology', 'theology'] },
-  { id: 'gunsmithing', name: '槍械', prereq: ['militaryTraining'] },
-  { id: 'closeCombat', name: '格鬥', prereq: ['extravehicular'] }
+  { id: 'survival', name: '野外求生', prereq: ['botany','militaryTraining'] },
+  { id: 'gunsmithing', name: '槍械', prereq: ['extravehicular','militaryTraining'] },
+  { id: 'closeCombat', name: '格鬥', prereq: ['extravehicular','athletics','militaryTraining'] }
 ])
 
 const advancedSkills = ref([
   { id: 'xenopsychology', name: '智慧種族學', prereq: ['psychology'] },
   { id: 'xenobiology', name: '外星生物學', prereq: ['pathology'] },
-  { id: 'surgery', name: '手術', prereq: ['fieldMedicine'] },
+  { id: 'surgery', name: '手術', prereq: ['fieldMedicine','pathology'] },
   { id: 'planetology', name: '行星學', prereq: ['ecology', 'asteroid'] },
-  { id: 'robotics', name: '機器人學', prereq: ['asteroid'] },
+  { id: 'robotics', name: '機器人學', prereq: ['mechanics'] },
   { id: 'engineering', name: '工程學', prereq: ['mechanics'] },
-  { id: 'hyperspace', name: '橫控學', prereq: ['explosives'] },
+  { id: 'hyperspace', name: '模控學', prereq: ['mechanics'] },
   { id: 'ai', name: '人工智慧', prereq: ['hacking'] },
-  { id: 'hyperspace2', name: '超空間', prereq: ['physics', 'piloting'] },
-  { id: 'alienology', name: '異種妙教', prereq: ['mysticism'] },
-  { id: 'command', name: '指揮', prereq: ['gunsmithing', 'survival'] }
+  { id: 'hyperspace2', name: '超空間', prereq: ['physics', 'piloting','mysticism'] },
+  { id: 'alienology', name: '異種秘教', prereq: ['mysticism'] },
+  { id: 'command', name: '指揮', prereq: ['gunsmithing', 'piloting'] }
 ])
 
-// 技能連接關係 - 自動生成基於先決條件
-const skillConnections = computed(() => {
-  const connections = []
-  
-  // 為中階技能生成連線
-  intermediateSkills.value.forEach(skill => {
-    if (skill.prereq && Array.isArray(skill.prereq)) {
-      skill.prereq.forEach(prereqId => {
-        connections.push({ from: prereqId, to: skill.id })
-      })
-    } else if (skill.prereq) {
-      connections.push({ from: skill.prereq, to: skill.id })
-    }
-  })
-  
-  // 為高階技能生成連線
-  advancedSkills.value.forEach(skill => {
-    if (skill.prereq && Array.isArray(skill.prereq)) {
-      skill.prereq.forEach(prereqId => {
-        connections.push({ from: prereqId, to: skill.id })
-      })
-    } else if (skill.prereq) {
-      connections.push({ from: skill.prereq, to: skill.id })
-    }
-  })
-  
-  return connections
-})
+// skillConnections 已移除
 
 // 顯示複製成功提示
 const showCopySuccess = (text) => {
@@ -853,8 +822,8 @@ const canSelectSkill = (skillId) => {
   const skill = [...intermediateSkills.value, ...advancedSkills.value].find(s => s.id === skillId)
   if (!skill || !skill.prereq || skill.prereq.length === 0) return true
   
-  // 檢查所有先決條件是否都已選擇
-  return skill.prereq.every(prereqId => isSkillSelected(prereqId))
+  // 檢查是否有任一先決條件已選擇 (OR 邏輯)
+  return skill.prereq.some(prereqId => isSkillSelected(prereqId))
 }
 
 const toggleSkill = (skillId) => {
@@ -896,7 +865,7 @@ const getSkillTooltip = (skill) => {
   
   if (skill.prereq) {
     if (Array.isArray(skill.prereq)) {
-      tooltip += '\n需要: ' + skill.prereq.join(', ')
+      tooltip += '\n需要任一: ' + skill.prereq.join(' 或 ')
     } else {
       tooltip += '\n需要: ' + skill.prereq
     }
@@ -947,16 +916,7 @@ const isConnectionActive = (fromId, toId) => {
   return isSkillSelected(fromId) && isSkillSelected(toId)
 }
 
-const hasConnection = (skillId) => {
-  // 檢查此技能是否有連接到其他技能
-  return skillConnections.value.some(conn => conn.from === skillId)
-}
-
-const hasActiveConnection = (skillId) => {
-  // 檢查此技能的連接線是否應該高亮
-  const connections = skillConnections.value.filter(conn => conn.from === skillId)
-  return connections.some(conn => isSkillSelected(skillId) && isSkillSelected(conn.to))
-}
+// 連線相關函數已移除
 
 // Modal 管理函數
 const closeSkillTreeModal = () => {
