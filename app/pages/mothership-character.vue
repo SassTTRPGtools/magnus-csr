@@ -43,10 +43,10 @@
             <div class="border border-green-400 bg-black bg-opacity-80">
               <div class="grid grid-cols-2 border-b border-green-400 text-center text-xs font-bold uppercase bg-green-900 bg-opacity-30 text-green-300">
                 <div class="p-2 border-r border-green-400 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">TIER</span>
+                  <span class="text-green-500">></span> <span class="ml-1">位階</span>
                 </div>
                 <div class="p-2 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">EFFORT</span>
+                  <span class="text-green-500">></span> <span class="ml-1">努力值</span>
                 </div>
               </div>
               <div class="grid grid-cols-2 text-center">
@@ -63,13 +63,13 @@
             <div class="border border-green-400 bg-black bg-opacity-80">
               <div class="grid grid-cols-3 border-b border-green-400 text-center text-xs font-bold uppercase bg-green-900 bg-opacity-30 text-green-300">
                 <div class="p-2 border-r border-green-400 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">MIGHT</span>
+                  <span class="text-green-500">></span> <span class="ml-1">氣力</span>
                 </div>
                 <div class="p-2 border-r border-green-400 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">SPEED</span>
+                  <span class="text-green-500">></span> <span class="ml-1">速度</span>
                 </div>
                 <div class="p-2 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">INTELLECT</span>
+                  <span class="text-green-500">></span> <span class="ml-1">智力</span>
                 </div>
               </div>
               
@@ -88,7 +88,7 @@
                 <!-- 氣力 -->
                 <div class="grid grid-cols-2 gap-1 p-1 border-r border-black">
                   <div>
-                    <span class="block mb-1">池</span>
+                    <span class="block mb-1">上限</span>
                     <input type="number" v-model.number="character.might.pool" 
                            class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
                   </div>
@@ -101,7 +101,7 @@
                 <!-- 速度 -->
                 <div class="grid grid-cols-2 gap-1 p-1 border-r border-black">
                   <div>
-                    <span class="block mb-1">池</span>
+                    <span class="block mb-1">上限</span>
                     <input type="number" v-model.number="character.speed.pool" 
                            class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
                   </div>
@@ -114,7 +114,7 @@
                 <!-- 智力 -->
                 <div class="grid grid-cols-2 gap-1 p-1">
                   <div>
-                    <span class="block mb-1">池</span>
+                    <span class="block mb-1">上限</span>
                     <input type="number" v-model.number="character.intellect.pool" 
                            class="w-full bg-transparent text-center font-typewriter border-b border-black focus:outline-none">
                   </div>
@@ -132,7 +132,7 @@
           <div class="mb-6">
             <div class="border border-green-400 bg-black bg-opacity-80 p-4">
               <div class="text-green-300 text-sm uppercase tracking-wider mb-4 text-center flex items-center justify-center">
-                <span class="text-green-500">></span> <span class="ml-1">RECOVERY.DICE</span>
+                <span class="text-green-500">></span> <span class="ml-1">恢復動作</span>
               </div>
               
               <!-- 兩欄佈局 -->
@@ -146,24 +146,23 @@
                   </div>
                 </div>
                 
-                <!-- 右欄：2x2 checkbox grid -->
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
-                    <input type="checkbox" v-model="character.recoveryRolls.action" class="mr-2 scale-90">
-                    <span class="font-medium">動作</span>
-                  </label>
-                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
-                    <input type="checkbox" v-model="character.recoveryRolls.tenMin" class="mr-2 scale-90">
-                    <span class="font-medium">10分鐘</span>
-                  </label>
-                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
-                    <input type="checkbox" v-model="character.recoveryRolls.oneHour" class="mr-2 scale-90">
-                    <span class="font-medium">1小時</span>
-                  </label>
-                  <label class="flex items-center track-item p-2 border border-gray-300 rounded">
-                    <input type="checkbox" v-model="character.recoveryRolls.tenHours" class="mr-2 scale-90">
-                    <span class="font-medium">10小時</span>
-                  </label>
+                <!-- 右欄：恢復動作格子 -->
+                <div class="space-y-2">
+                  <div class="text-xs font-mono text-green-400 mb-2 text-center">恢復動作</div>
+                  
+                  <!-- 第一個格子：動作 -->
+                  <div class="mb-2">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-xs font-semibold text-green-400 font-mono">動作</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1">
+                      <div v-for="(roll, index) in getActionRecoveryRolls()" :key="`action-${index}`" 
+                           class="w-6 h-6 border-2 border-green-600 bg-green-50 flex items-center justify-center cursor-pointer hover:bg-green-100"
+                           @click="roll.used = !roll.used">
+                        <span v-if="roll.used" class="text-green-800 font-bold text-xs">✓</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -427,7 +426,7 @@
             <div class="border border-green-400 bg-black bg-opacity-80 p-4">
               <div class="flex items-center justify-between mb-4">
                 <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
-                  <span class="text-green-500">></span> <span class="ml-1">CYPHERS</span>
+                  <span class="text-green-500">></span> <span class="ml-1">密鑰</span>
                 </div>
                 <div class="flex items-center space-x-2">
                   <div class="flex items-center space-x-1">
@@ -503,6 +502,117 @@
             </div>
           </div>
 
+          <!-- 物品欄 -->
+          <div class="mb-6">
+            <div class="border border-green-400 bg-black bg-opacity-80 p-4">
+              <div class="flex items-center justify-between mb-4">
+                <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
+                  <span class="text-green-500">></span> <span class="ml-1">物品欄</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="flex items-center space-x-1">
+                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
+                    <input type="number" v-model.number="character.inventoryLimit" min="0" 
+                           class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" 
+                           placeholder="0">
+                  </div>
+                  <button @click="toggleInventoryEditMode" 
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            'bg-blue-900 text-blue-100 border-blue-400 hover:bg-blue-800 hover:shadow-lg hover:shadow-blue-400/30'
+                          ]">
+                    {{ inventoryEditMode ? '[VIEW]' : '[EDIT]' }}
+                  </button>
+                  <button @click="addNewItem" 
+                          v-if="inventoryEditMode"
+                          :disabled="character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit"
+                          :class="[
+                            'text-xs px-2 py-1 border font-mono transition-all duration-200',
+                            character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit 
+                              ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
+                              : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
+                          ]">
+                    [+ADD]
+                  </button>
+                </div>
+              </div>
+              
+              <!-- 編輯模式 -->
+              <div v-if="inventoryEditMode" class="space-y-2 max-h-96 overflow-y-auto">
+                <div v-for="(item, index) in (character.inventory || [])" :key="index" 
+                     class="border border-green-600 bg-green-900 bg-opacity-20 p-3 hover:bg-green-900 hover:bg-opacity-30 transition-all duration-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <button @click="item.collapsed = !item.collapsed" 
+                            class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
+                      <span class="mr-2 text-green-500">{{ item.collapsed ? '>' : 'v' }}</span>
+                      <span>{{ getItemTitle(item.content) || `ITEM_${String(index + 1).padStart(2, '0')}` }}</span>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                      <button @click="copyItemToClipboard(item)" 
+                              class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" 
+                              title="Copy item data">
+                        [CPY]
+                      </button>
+                      <button @click="removeItem(index)" 
+                              class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
+                        [DEL]
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div v-if="!item.collapsed">
+                    <textarea v-model="item.content" 
+                             placeholder="物品名稱 | 價格&#10;物品描述..." 
+                             class="w-full h-24 text-xs bg-transparent border border-green-600 text-green-100 placeholder-green-400 font-mono p-2 resize-none focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20"
+                             rows="4"></textarea>
+                  </div>
+                  
+                  <!-- 摺疊時顯示預覽 -->
+                  <div v-else-if="item.content" class="text-xs text-green-400 italic truncate font-mono">
+                    {{ getItemPreview(item.content) }}
+                  </div>
+                </div>
+                
+                <!-- 無物品時的提示 -->
+                <div v-if="!character.inventory || character.inventory.length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
+                  > NO.ITEMS.LOADED
+                </div>
+                
+                <!-- 物品上限提示 -->
+                <div v-if="character.inventoryLimit > 0 && character.inventory && character.inventory.length >= character.inventoryLimit" 
+                     class="text-center text-yellow-600 text-xs py-2 border border-yellow-400 bg-yellow-900 bg-opacity-20 font-mono">
+                  已達物品上限 ({{ character.inventory ? character.inventory.length : 0 }}/{{ character.inventoryLimit }})
+                </div>
+              </div>
+              
+              <!-- 查看模式 -->
+              <div v-else class="space-y-4 max-h-96 overflow-y-auto">
+                <div v-for="(category, categoryName) in categorizedItems" :key="categoryName" class="mb-4">
+                  <h3 class="text-green-400 font-mono text-sm font-bold mb-2 border-b border-green-600 pb-1">
+                    {{ categoryName }}
+                  </h3>
+                  <div class="grid grid-cols-1 gap-2">
+                    <div v-for="(item, index) in category" :key="index" 
+                         class="bg-green-900 bg-opacity-10 border border-green-600 p-2 hover:bg-green-900 hover:bg-opacity-20 transition-all duration-200 cursor-help"
+                         :title="getItemTooltip(item)">
+                      <div class="flex items-center justify-between">
+                        <span class="font-mono text-green-100 text-sm">{{ item.name }}</span>
+                        <span class="font-mono text-yellow-400 text-xs">{{ item.price }}</span>
+                      </div>
+                      <div class="text-green-400 text-xs font-mono mt-1 opacity-80">
+                        {{ item.description.length > 60 ? item.description.substring(0, 60) + '...' : item.description }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 無物品時的提示 -->
+                <div v-if="Object.keys(categorizedItems).length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
+                  > NO.ITEMS.LOADED
+                </div>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -654,10 +764,21 @@ const character = ref({
     current: 0
   },
   recoveryRolls: {
-    action: false,
-    tenMin: false,
-    oneHour: false,
-    tenHours: false
+    action: [
+      { used: false },
+      { used: false },
+      { used: false }
+    ],
+    tenMin: [
+      { used: false },
+      { used: false },
+      { used: false }
+    ],
+    oneHour: [
+      { used: false },
+      { used: false },
+      { used: false }
+    ]
   },
   currentStress: 0,
   stressMin: 0,
@@ -675,6 +796,8 @@ const character = ref({
   ],
   cyphers: [],
   cypherLimit: 0,
+  inventory: [],
+  inventoryLimit: 0,
   selectedSkills: [],
   xp: 0,
   background: '',
@@ -693,6 +816,9 @@ const showSkillTreeModal = ref(false)
 const showTerminalConfirm = ref(false)
 const terminalConfirmMessage = ref('')
 const terminalConfirmCallback = ref(null)
+
+// 物品欄編輯模式
+const inventoryEditMode = ref(false)
 
 // 技能樹資料
 const basicSkills = ref([
@@ -803,11 +929,11 @@ const getCypherJsonPath = () => {
   // 但前端可用 window.location.pathname 判斷
   const isDev = process.dev || window.location.hostname === 'localhost'
   if (isDev) {
-    return '/data/cypher.json'
+    return '/data/mothership-cypher.json'
   } else {
     // 取得 base 路徑（假設部署在 /magnus-csr）
     const base = window.location.pathname.split('/').filter(Boolean)[0] || ''
-    return `/${base}/data/cypher.json`
+    return `/${base}/data/mothership-cypher.json`
   }
 }
 
@@ -955,6 +1081,164 @@ const confirmTerminalAction = () => {
   if (terminalConfirmCallback.value) {
     terminalConfirmCallback.value()
   }
+}
+
+// 物品欄管理函數
+const toggleInventoryEditMode = () => {
+  inventoryEditMode.value = !inventoryEditMode.value
+}
+
+const addNewItem = () => {
+  // 確保inventory存在
+  if (!character.value.inventory) {
+    character.value.inventory = []
+  }
+  
+  if (character.value.inventoryLimit > 0 && character.value.inventory.length >= character.value.inventoryLimit) {
+    showTerminalConfirm.value = true
+    terminalConfirmMessage.value = `> INVENTORY_LIMIT_REACHED\n> CURRENT_ITEMS: ${character.value.inventory.length}\n> MAX_LIMIT: ${character.value.inventoryLimit}\n> CANNOT_ADD_MORE_ITEMS`
+    terminalConfirmCallback.value = () => {
+      closeTerminalConfirm()
+    }
+    return
+  }
+  
+  character.value.inventory.push({
+    content: '',
+    collapsed: false
+  })
+}
+
+const removeItem = (index) => {
+  if (character.value.inventory && Array.isArray(character.value.inventory)) {
+    character.value.inventory.splice(index, 1)
+  }
+}
+
+const copyItemToClipboard = async (item) => {
+  const itemText = item.content || '(空白物品)'
+  
+  try {
+    await navigator.clipboard.writeText(itemText)
+    showCopySuccess('物品內容已複製！')
+  } catch (error) {
+    console.error('複製失敗:', error)
+    const textArea = document.createElement('textarea')
+    textArea.value = itemText
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      showCopySuccess('物品內容已複製！')
+    } catch (fallbackError) {
+      alert('複製失敗，請手動複製內容')
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+const getItemTitle = (content) => {
+  if (!content) return ''
+  const lines = content.split('\n')
+  const firstLine = lines[0]
+  const titleMatch = firstLine.match(/^([^|]+)/) 
+  return titleMatch ? titleMatch[1].trim() : firstLine.trim()
+}
+
+const getItemPreview = (content) => {
+  if (!content) return ''
+  const lines = content.split('\n')
+  const preview = lines.slice(0, 2).join(' ').replace(/\s+/g, ' ').trim()
+  return preview.length > 80 ? preview.substring(0, 80) + '...' : preview
+}
+
+const parseItemContent = (content) => {
+  if (!content) return { name: '', price: '', description: '', category: '其他' }
+  
+  const lines = content.split('\n')
+  const firstLine = lines[0] || ''
+  const parts = firstLine.split('|')
+  
+  const name = parts[0] ? parts[0].trim() : ''
+  const price = parts[1] ? parts[1].trim() : ''
+  const description = lines.slice(1).join(' ').trim()
+  
+  // 根據物品名稱或描述判斷類別
+  let category = '其他'
+  const nameAndDesc = (name + ' ' + description).toLowerCase()
+  
+  if (nameAndDesc.includes('武器') || nameAndDesc.includes('槍') || nameAndDesc.includes('刀') || 
+      nameAndDesc.includes('彈藥') || nameAndDesc.includes('手榴彈') || nameAndDesc.includes('爆炸')) {
+    category = '武器'
+  } else if (nameAndDesc.includes('護甲') || nameAndDesc.includes('制服') || nameAndDesc.includes('防具')) {
+    category = '護甲'
+  } else if (nameAndDesc.includes('醫療') || nameAndDesc.includes('藥') || nameAndDesc.includes('治療') || 
+             nameAndDesc.includes('急救') || nameAndDesc.includes('掃描')) {
+    category = '醫療裝備'
+  } else if (nameAndDesc.includes('工具') || nameAndDesc.includes('電子') || nameAndDesc.includes('維修')) {
+    category = '工具裝備'
+  } else if (nameAndDesc.includes('通訊') || nameAndDesc.includes('電子') || nameAndDesc.includes('無線電')) {
+    category = '通訊裝備'
+  }
+  
+  return { name, price, description, category }
+}
+
+const categorizedItems = computed(() => {
+  const categories = {}
+  
+  // 安全檢查，確保inventory存在且為陣列
+  if (character.value.inventory && Array.isArray(character.value.inventory)) {
+    character.value.inventory.forEach(item => {
+      if (!item.content) return
+      
+      const parsed = parseItemContent(item.content)
+      if (!categories[parsed.category]) {
+        categories[parsed.category] = []
+      }
+      categories[parsed.category].push(parsed)
+    })
+  }
+  
+  return categories
+})
+
+const getItemTooltip = (item) => {
+  return `${item.name}\n價格: ${item.price}\n\n${item.description}`
+}
+
+// 恢復動作相關函數
+const getActionRecoveryRolls = () => {
+  if (!character.value.recoveryRolls.action || !Array.isArray(character.value.recoveryRolls.action)) {
+    character.value.recoveryRolls.action = [
+      { used: false },
+      { used: false },
+      { used: false }
+    ]
+  }
+  return character.value.recoveryRolls.action
+}
+
+const getTenMinRecoveryRolls = () => {
+  if (!character.value.recoveryRolls.tenMin || !Array.isArray(character.value.recoveryRolls.tenMin)) {
+    character.value.recoveryRolls.tenMin = [
+      { used: false },
+      { used: false },
+      { used: false }
+    ]
+  }
+  return character.value.recoveryRolls.tenMin
+}
+
+const getOneHourRecoveryRolls = () => {
+  if (!character.value.recoveryRolls.oneHour || !Array.isArray(character.value.recoveryRolls.oneHour)) {
+    character.value.recoveryRolls.oneHour = [
+      { used: false },
+      { used: false },
+      { used: false }
+    ]
+  }
+  return character.value.recoveryRolls.oneHour
 }
 
 const getSkillName = (skillId) => {
@@ -1144,17 +1428,17 @@ const clearForm = () => {
       focus: '',
       tier: 1,
       effort: 1,
-      might: { pool: 0, edge: 0, current: 0 },
-      speed: { pool: 0, edge: 0, current: 0 },
-      intellect: { pool: 0, edge: 0, current: 0 },
+      might: { pool: 10, edge: 0, current: 10 },
+      speed: { pool: 10, edge: 0, current: 10 },
+      intellect: { pool: 10, edge: 0, current: 10 },
       recoveryRolls: {
         action: false,
         tenMin: false,
         oneHour: false,
         tenHours: false
       },
-      currentStress: 0,
-      stressMin: 0,
+      currentStress: 2,
+      stressMin: 2,
       wounds: [
         // 預設 3 個輕度傷勢格
         { severity: 'light', checked: false },
@@ -1225,10 +1509,21 @@ const loadFromLocalStorage = () => {
         speed: { pool: 10, edge: 0, current: 10},
         intellect: { pool: 10, edge: 0, current: 10 },
         recoveryRolls: {
-          action: false,
-          tenMin: false,
-          oneHour: false,
-          tenHours: false
+          action: [
+            { used: false },
+            { used: false },
+            { used: false }
+          ],
+          tenMin: [
+            { used: false },
+            { used: false },
+            { used: false }
+          ],
+          oneHour: [
+            { used: false },
+            { used: false },
+            { used: false }
+          ]
         },
         currentStress: 2,
         stressMin: 2,
@@ -1246,13 +1541,17 @@ const loadFromLocalStorage = () => {
         ],
         cyphers: [],
         cypherLimit: 0,
+        inventory: [],
+        inventoryLimit: 0,
         selectedSkills: [],
         xp: 0,
         background: '',
         recoveryBonus: 0,
         abilities: [], // 保留以防錯誤
         ...parsedData, // 覆蓋已儲存的資料
-        selectedSkills: parsedData.selectedSkills || [] // 確保技能選擇格式正確
+        selectedSkills: parsedData.selectedSkills || [], // 確保技能選擇格式正確
+        inventory: parsedData.inventory || [], // 確保物品欄格式正確
+        inventoryLimit: parsedData.inventoryLimit || 0 // 確保物品上限格式正確
       }
       
       // 確保陣列長度正確
