@@ -375,6 +375,20 @@
             <div class="mt-2 text-xs text-green-600 tracking-wider">SECURITY CLEARANCE: AUTHORIZED</div>
           </div>
 
+          <!-- 專屬能力 -->
+          <div class="mb-6">
+            <div class="border border-green-400 bg-black bg-opacity-80 p-4">
+              <div class="text-green-300 text-sm uppercase tracking-wider mb-4 flex items-center">
+                <span class="text-green-500">></span> <span class="ml-1">SPECIAL.ABILITIES</span>
+              </div>
+              
+              <textarea v-model="character.specialAbilities" 
+                       placeholder="輸入專屬能力、特殊技能或其他額外訊息..." 
+                       class="w-full h-40 text-sm bg-transparent border border-green-600 text-green-100 placeholder-green-400 font-mono p-3 resize-none focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20 transition-all duration-200"
+                       rows="4"></textarea>
+            </div>
+          </div>
+
           <!-- 創傷系統 -->
           <div class="mb-6">
             <div class="border border-red-400 bg-black bg-opacity-80 p-4">
@@ -875,6 +889,7 @@ const character = ref({
   inventoryLimit: 7,
   selectedSkills: [],
   traumas: [],
+  specialAbilities: '',
   xp: 0,
   background: '',
   recoveryBonus: 0,
