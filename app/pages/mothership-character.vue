@@ -365,7 +365,7 @@
           <div class="text-center mb-8 p-6 border border-green-400 bg-black bg-opacity-90">
             <div class="text-green-300 text-xs mb-2 tracking-widest">SYSTEM INTERFACE V2.1</div>
             <h1 class="text-4xl font-bold text-green-400 font-mono tracking-wider mb-2 animate-pulse">
-              MOTHERSHIP
+              老派風格太空恐怖
             </h1>
             <div class="flex items-center justify-center space-x-2 text-xl text-green-300 font-mono tracking-widest">
               <span class="text-green-500">></span>

@@ -4,7 +4,7 @@
       <div class="text-2xl font-bold text-magnus-text tracking-widest magnus-title drop-shadow font-typewriter">CSR角色表</div>
       <nav class="space-x-4">        
         <NuxtLink to="/character" class="text-magnus-text hover:text-magnus-accent font-semibold transition duration-300">馬格努斯檔案角色表</NuxtLink>
-        <NuxtLink to="/mothership-character" class="text-magnus-text hover:text-magnus-accent font-semibold transition duration-300">母艦驚魂角色表</NuxtLink>
+        <NuxtLink to="/mothership-character" class="text-magnus-text hover:text-magnus-accent font-semibold transition duration-300">OSR太空恐怖角色表</NuxtLink>
         <NuxtLink to="/" class="text-magnus-text hover:text-magnus-accent font-semibold transition duration-300">首頁</NuxtLink>
       </nav>
     </header>
