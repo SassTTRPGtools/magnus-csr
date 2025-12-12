@@ -22,17 +22,17 @@
             <div class="border border-green-400 bg-black bg-opacity-80 p-4 shadow-lg shadow-green-400/20">
               <div class="text-center mb-4">
                 <div class="text-green-300 text-xs uppercase tracking-wider mb-2 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">OPERATIVE.NAME</span>
+                  <span class="text-green-500">></span> <span class="ml-1">角色.名稱</span>
                 </div>
                 <input type="text" v-model="character.name" 
-                       class="w-full border-b border-green-400 bg-transparent text-center font-mono text-lg text-green-100 focus:outline-none focus:border-yellow-400 focus:text-yellow-100 transition-colors placeholder-green-600" placeholder="[CLASSIFIED]">
+                       class="w-full border-b border-green-400 bg-transparent text-center font-mono text-lg text-green-100 focus:outline-none focus:border-yellow-400 focus:text-yellow-100 transition-colors placeholder-green-600" placeholder="[機密]">
               </div>            
 
               <div class="text-center">
                 <input type="text" v-model="character.focus" 
-                       class="w-full border-b border-green-400 bg-transparent text-center font-mono text-green-100 focus:outline-none focus:border-yellow-400 focus:text-yellow-100 transition-colors placeholder-green-600" placeholder="[ASSIGNMENT]">
+                       class="w-full border-b border-green-400 bg-transparent text-center font-mono text-green-100 focus:outline-none focus:border-yellow-400 focus:text-yellow-100 transition-colors placeholder-green-600" placeholder="[指派中]">
                 <div class="text-green-300 text-xs uppercase tracking-wider mt-2 flex items-center justify-center">
-                  <span class="text-green-500">></span> <span class="ml-1">ROLE.TEMPLATE</span>
+                  <span class="text-green-500">></span> <span class="ml-1">角色.模板</span>
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@
               <div class="text-center mb-4">
                 <button @click="copyStatusToClipboard" 
                         class="text-xs px-3 py-2 bg-blue-900 text-blue-100 hover:bg-blue-800 border border-blue-400 font-mono transition-all duration-200 hover:shadow-lg hover:shadow-blue-400/30">
-                  [COPY_STATUS]
+                  [複製_狀態]
                 </button>
               </div>
               
@@ -333,26 +333,26 @@
           <div>
             <div class="border border-green-400 bg-black bg-opacity-80 p-4">
               <div class="text-green-300 text-xs uppercase tracking-wider mb-4 flex items-center">
-                <span class="text-green-500">></span> <span class="ml-1">DATA.MANAGEMENT</span>
+                <span class="text-green-500">></span> <span class="ml-1">資料管理</span>
               </div>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <!-- 第一行 -->
                 <button @click="exportToJSON" 
                         class="px-3 py-2 bg-purple-900 text-purple-100 hover:bg-purple-800 border border-purple-400 font-mono transition-all duration-200 hover:shadow-lg hover:shadow-purple-400/30">
-                  [EXPORT_JSON]
+                  [匯出_JSON]
                 </button>
                 <label class="px-3 py-2 bg-orange-900 text-orange-100 hover:bg-orange-800 border border-orange-400 font-mono cursor-pointer text-center transition-all duration-200 hover:shadow-lg hover:shadow-orange-400/30">
-                  [IMPORT_JSON]
+                  [匯入_JSON]
                   <input type="file" @change="importFromJSON" accept=".json" class="hidden">
                 </label>
                 <!-- 第二行 -->
                 <button @click="exportToText" 
                         class="px-3 py-2 bg-gray-800 text-gray-100 hover:bg-gray-700 border border-gray-400 font-mono transition-all duration-200 hover:shadow-lg hover:shadow-gray-400/30">
-                  [COPY_TEXT]
+                  [複製_文字]
                 </button>
                 <button @click="clearForm" 
                         class="px-3 py-2 bg-red-900 text-red-100 hover:bg-red-800 border border-red-400 font-mono transition-all duration-200 hover:shadow-lg hover:shadow-red-400/30">
-                  [CLEAR_ALL]
+                  [清除_全部]
                 </button>
               </div>
             </div>
@@ -363,7 +363,7 @@
         <div class="character-sheet-column">
           <!-- 標題 -->
           <div class="text-center mb-8 p-6 border border-green-400 bg-black bg-opacity-90">
-            <div class="text-green-300 text-xs mb-2 tracking-widest">SYSTEM INTERFACE V2.1</div>
+            <div class="text-green-300 text-xs mb-2 tracking-widest">系統 介面 V2.1</div>
             <h1 class="text-4xl font-bold text-green-400 font-mono tracking-wider mb-2 animate-pulse">
               老派風格太空恐怖
             </h1>
@@ -379,7 +379,7 @@
           <div class="mb-6">
             <div class="border border-green-400 bg-black bg-opacity-80 p-4">
               <div class="text-green-300 text-sm uppercase tracking-wider mb-4 flex items-center">
-                <span class="text-green-500">></span> <span class="ml-1">SPECIAL.ABILITIES</span>
+                <span class="text-green-500">></span> <span class="ml-1">特殊.能力</span>
               </div>
               
               <textarea v-model="character.specialAbilities" 
@@ -436,7 +436,7 @@
                     </div>
                     <button @click="removeTrauma(index)" 
                             class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
-                      [DEL]
+                      [刪除]
                     </button>
                   </div>
                   
@@ -450,7 +450,7 @@
                 <!-- 無創傷時的提示 -->
                 <div v-if="!character.traumas || character.traumas.length === 0" 
                      class="text-center text-red-500 font-mono text-xs p-4 border border-red-600 bg-black bg-opacity-50">
-                  > NO.TRAUMA.RECORDED
+                  > 無.創傷.被記錄
                 </div>
               </div>
             </div>
@@ -465,7 +465,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <div class="flex items-center space-x-1">
-                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
+                    <span class="text-xs text-red-300 font-mono">[上限]</span>
                     <input type="number" v-model.number="character.inventoryLimit" min="7" 
                            class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" 
                            placeholder="0">
@@ -475,7 +475,7 @@
                             'text-xs px-2 py-1 border font-mono transition-all duration-200',
                             'bg-blue-900 text-blue-100 border-blue-400 hover:bg-blue-800 hover:shadow-lg hover:shadow-blue-400/30'
                           ]">
-                    {{ inventoryEditMode ? '[VIEW]' : '[EDIT]' }}
+                    {{ inventoryEditMode ? '[顯示]' : '[修改]' }}
                   </button>
                   <button @click="addNewItem" 
                           v-if="inventoryEditMode"
@@ -486,7 +486,7 @@
                               ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
                               : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
                           ]">
-                    [+ADD]
+                    [+新增]
                   </button>
                 </div>
               </div>
@@ -499,17 +499,17 @@
                     <button @click="item.collapsed = !item.collapsed" 
                             class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
                       <span class="mr-2 text-green-500">{{ item.collapsed ? '>' : 'v' }}</span>
-                      <span>{{ getItemTitle(item.content) || `ITEM_${String(index + 1).padStart(2, '0')}` }}</span>
+                      <span>{{ getItemTitle(item.content) || `裝備_${String(index + 1).padStart(2, '0')}` }}</span>
                     </button>
                     <div class="flex items-center space-x-2">
                       <button @click="copyItemToClipboard(item)" 
                               class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" 
                               title="Copy item data">
-                        [CPY]
+                        [複製]
                       </button>
                       <button @click="removeItem(index)" 
                               class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
-                        [DEL]
+                        [刪除]
                       </button>
                     </div>
                   </div>
@@ -529,7 +529,7 @@
                 
                 <!-- 無物品時的提示 -->
                 <div v-if="!character.inventory || character.inventory.length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
-                  > NO.ITEMS.LOADED
+                  >無.持有.裝備
                 </div>
                 
                 <!-- 物品上限提示 -->
@@ -562,7 +562,7 @@
                 
                 <!-- 無物品時的提示 -->
                 <div v-if="Object.keys(categorizedItems).length === 0" class="text-center text-green-500 font-mono text-xs p-4 border border-green-600 bg-black bg-opacity-50">
-                  > NO.ITEMS.LOADED
+                  > 無.持有.裝備
                 </div>
               </div>
             </div>
@@ -581,7 +581,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <div class="flex items-center space-x-1">
-                    <span class="text-xs text-red-300 font-mono">[LIMIT]</span>
+                    <span class="text-xs text-red-300 font-mono">[上限]</span>
                     <input type="number" v-model.number="character.cypherLimit" min="0" class="w-12 px-1 py-1 border border-green-400 bg-transparent text-center font-mono text-xs text-green-100 focus:outline-none focus:border-yellow-400 focus:bg-green-900 focus:bg-opacity-20" placeholder="0">
                   </div>
                   <button @click="generateRandomCyphers" 
@@ -592,7 +592,7 @@
                               ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
                               : 'bg-yellow-900 text-yellow-100 border-yellow-400 hover:bg-yellow-800 hover:shadow-lg hover:shadow-yellow-400/30'
                           ]">
-                    [RNG]
+                    [隨機]
                   </button>
                   <button @click="addNewCypher" 
                           :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
@@ -602,7 +602,7 @@
                               ? 'bg-gray-800 text-gray-500 border-gray-600 cursor-not-allowed' 
                               : 'bg-green-900 text-green-100 border-green-400 hover:bg-green-800 hover:shadow-lg hover:shadow-green-400/30'
                           ]">
-                    [+ADD]
+                    [+新增]
                   </button>
                 </div>
               </div>
@@ -614,14 +614,14 @@
                     <button @click="cypher.collapsed = !cypher.collapsed" 
                             class="flex items-center text-sm font-mono text-green-100 hover:text-green-300 flex-1 text-left transition-colors">
                       <span class="mr-2 text-green-500">{{ cypher.collapsed ? '>' : 'v' }}</span>
-                      <span>{{ getCypherTitle(cypher.content) || `CYPHER_${String(index + 1).padStart(2, '0')}` }}</span>
+                      <span>{{ getCypherTitle(cypher.content) || `密鑰_${String(index + 1).padStart(2, '0')}` }}</span>
                     </button>
                     <div class="flex items-center space-x-2">
                       <button @click="copyCypherToClipboard(cypher)" class="text-blue-400 hover:text-blue-300 text-xs px-1 py-1 border border-blue-500 hover:bg-blue-900 hover:bg-opacity-30 font-mono transition-all" title="Copy cypher data">
-                        [CPY]
+                        [複製]
                       </button>
                       <button @click="removeCypher(index)" class="text-red-400 hover:text-red-300 text-xs px-1 py-1 border border-red-500 hover:bg-red-900 hover:bg-opacity-30 font-mono transition-all">
-                        [DEL]
+                        [刪除]
                       </button>
                     </div>
                   </div>
@@ -658,12 +658,12 @@
             <div class="border border-green-400 bg-black bg-opacity-80 p-4">
               <div class="flex items-center justify-between mb-4">
                 <div class="text-green-300 text-sm uppercase tracking-wider flex items-center">
-                  <span class="text-green-500">></span> <span class="ml-1">LEARNED.SKILLS</span>
+                  <span class="text-green-500">></span> <span class="ml-1">習得.技能</span>
                 </div>
                 <div class="flex items-center space-x-2">
                   <button @click="showSkillTreeModal = true" 
                           class="text-xs px-3 py-1 bg-green-900 text-green-100 hover:bg-green-800 border border-green-400 font-mono transition-all duration-200 hover:shadow-lg hover:shadow-green-400/30">
-                    [MANAGE]
+                    [管理]
                   </button>
                   <button @click="clearAllSkills" 
                           :disabled="character.selectedSkills.length === 0"
@@ -673,7 +673,7 @@
                               ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-600' 
                               : 'bg-red-900 text-red-100 hover:bg-red-800 border border-red-400 hover:shadow-lg hover:shadow-red-400/30'
                           ]">
-                    [PURGE]
+                    [清除]
                   </button>
                 </div>
               </div>
@@ -1857,13 +1857,30 @@ const importFromJSON = (event) => {
 
 const exportToText = async () => {
   try {
-    // 獲取已選擇的技能
-    const selectedSkillNames = character.value.selectedSkills.map(skillId => {
-      const skill = [...basicSkills, ...intermediateSkills, ...advancedSkills].find(s => s.id === skillId)
-      return skill ? skill.name : skillId
+    // 獲取已選擇的技能，並標註階級
+    const selectedSkillsWithTier = character.value.selectedSkills.map(skillId => {
+      // 檢查是否為基礎技能
+      const basicSkill = basicSkills.value.find(s => s.id === skillId)
+      if (basicSkill) {
+        return `${basicSkill.name}（基礎）`
+      }
+      
+      // 檢查是否為中階技能
+      const intermediateSkill = intermediateSkills.value.find(s => s.id === skillId)
+      if (intermediateSkill) {
+        return `${intermediateSkill.name}（中階）`
+      }
+      
+      // 檢查是否為高階技能
+      const advancedSkill = advancedSkills.value.find(s => s.id === skillId)
+      if (advancedSkill) {
+        return `${advancedSkill.name}（高階）`
+      }
+      
+      return skillId
     })
     
-    let textContent = `MOTHERSHIP RPG - 角色卡
+    let textContent = `太空科幻恐怖 - 角色卡
 ==========================================
 
 【基本資訊】
@@ -1889,8 +1906,8 @@ const exportToText = async () => {
 嚴重：${character.value.wounds.filter(w => w.severity === 'critical').map(w => w.checked ? '☑' : '☐').join(' ')}
 
 【已習得技能】
-${selectedSkillNames.length > 0 ? 
-  selectedSkillNames.map((skillName, index) => `${index + 1}. ${skillName}`).join('\n') : 
+${selectedSkillsWithTier.length > 0 ? 
+  selectedSkillsWithTier.join('、') : 
   '(尚未習得任何技能)'}
 
 【密鑰】(上限：${character.value.cypherLimit})
