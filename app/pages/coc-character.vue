@@ -200,7 +200,7 @@
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" v-model="character.advancementChecks.skill" class="mr-2">
-                      <span>技能：提升滿經歷點的技能組中的一項技能。</span>
+                      <span>技能：將一項技能提升一階，但不超過職業。</span>
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" v-model="character.advancementChecks.ability" class="mr-2">
@@ -331,10 +331,16 @@
                 <div class="border-2 border-black bg-white p-4">
                   <div class="flex items-center justify-between mb-2">
                     <div class="text-sm font-bold uppercase tracking-wide">技能</div>
-                    <button @click="showSkillsModal = true" 
-                            class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
-                      管理
-                    </button>
+                    <div class="flex gap-2">
+                      <button @click="showGrowthChartModal = true" 
+                              class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
+                        📊 成長對照
+                      </button>
+                      <button @click="showSkillsModal = true" 
+                              class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
+                        管理
+                      </button>
+                    </div>
                   </div>
                   <div class="text-xs text-gray-600 font-typewriter mb-4">
                     <span class="mr-3">外行🤡：需花費額外1級努力</span>
@@ -342,7 +348,15 @@
                   </div>
                   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3 bg-gray-50">
-                      <div class="text-sm font-bold mb-2">{{ category.icon }} {{ category.label }}</div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-bold">{{ category.icon }} {{ category.label }}</div>
+                        <label class="flex items-center cursor-pointer group">
+                          <input type="checkbox" v-model="character.skillCategoryGrowth[category.id]" class="sr-only peer">
+                          <div class="relative w-10 h-6 bg-gray-300 peer-checked:bg-green-600 rounded-full transition-colors border border-gray-400 peer-checked:border-green-700"></div>
+                          <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-4 transition-transform pointer-events-none"></div>
+                          <span class="ml-2 text-xs font-typewriter text-gray-600 group-hover:text-gray-800">{{ character.skillCategoryGrowth[category.id] ? '可成長' : '已鎖定' }}</span>
+                        </label>
+                      </div>
                       <div class="space-y-2">
                         <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="text-sm border-b border-gray-200 pb-2">
                           <div class="flex items-start justify-between">
@@ -590,6 +604,57 @@
       </div>
     </div>
   </div>
+
+  <!-- 技能成長對照 Modal -->
+  <div v-if="showGrowthChartModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="bg-white border-2 border-black w-full max-w-md overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between p-4 border-b border-black">
+        <div class="text-sm font-bold uppercase tracking-wide">技能成長對照表</div>
+        <button @click="showGrowthChartModal = false" class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">關閉</button>
+      </div>
+      <div class="p-6 overflow-y-auto">
+        <div class="space-y-3 font-typewriter text-sm">
+          <div class="border border-gray-300 rounded p-3 bg-gray-50">
+            <div class="font-bold text-center mb-4 text-base">位階成長目標值</div>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="font-bold">外行</span>
+                <span class="text-red-600 font-bold">≧ 12</span>
+              </div>
+              <div class="bg-white h-px"></div>
+              <div class="flex justify-between">
+                <span class="font-bold">新手</span>
+                <span class="text-orange-600 font-bold">≧ 14</span>
+              </div>
+              <div class="bg-white h-px"></div>
+              <div class="flex justify-between">
+                <span class="font-bold">業餘</span>
+                <span class="text-gray-600 font-bold">≧ 16</span>
+              </div>
+              <div class="bg-white h-px"></div>
+              <div class="flex justify-between">
+                <span class="font-bold">職業</span>
+                <span class="text-green-600 font-bold">≧ 18</span>
+              </div>
+              <div class="bg-white h-px"></div>
+              <div class="flex justify-between">
+                <span class="font-bold">專家</span>
+                <span class="text-blue-600 font-bold">≧ 19</span>
+              </div>
+              <div class="bg-white h-px"></div>
+              <div class="flex justify-between">
+                <span class="font-bold">大師</span>
+                <span class="text-purple-600 font-bold">= 20</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-gray-600 italic text-center mt-4">
+            達到目標值後，該技能可進行位階晉升。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -638,14 +703,21 @@ const character = ref({
   abilities: [],
   xp: 0,
   background: '',
-  recoveryBonus: 0
-  ,
+  recoveryBonus: 0,
   advancementChecks: {
     perfection: false,
     effort: false,
     skill: false,
     ability: false,
     recovery: false
+  },
+  skillCategoryGrowth: {
+    combat: false,
+    social: false,
+    investigation: false,
+    technical: false,
+    survival: false,
+    knowledge: false
   }
 })
 
@@ -654,6 +726,7 @@ const showCopyNotification = ref(false)
 const copyNotificationText = ref('')
 
 const showSkillsModal = ref(false)
+const showGrowthChartModal = ref(false)
 const showKeysModal = ref(false)
 const keysModalWidth = ref(400)
 const isResizingKeysModal = ref(false)
@@ -1245,14 +1318,21 @@ const clearForm = () => {
       abilities: [],
       xp: 0,
       background: '',
-      recoveryBonus: 0
-      ,
+      recoveryBonus: 0,
       advancementChecks: {
         perfection: false,
         effort: false,
         skill: false,
         ability: false,
         recovery: false
+      },
+      skillCategoryGrowth: {
+        combat: false,
+        social: false,
+        investigation: false,
+        technical: false,
+        survival: false,
+        knowledge: false
       }
     }
     showCopySuccess('所有資料已清空，可以建立新角色了！')
@@ -1329,6 +1409,14 @@ const loadFromLocalStorage = () => {
           skill: false,
           ability: false,
           recovery: false
+        },
+        skillCategoryGrowth: {
+          combat: false,
+          social: false,
+          investigation: false,
+          technical: false,
+          survival: false,
+          knowledge: false
         },
         ...parsedData, // 覆蓋已儲存的資料
         skills: processedSkills
