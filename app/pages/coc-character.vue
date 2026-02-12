@@ -1307,8 +1307,11 @@ const clearForm = () => {
         tenHours: false
       },
       damageTrack: 'hale',
-      currentStress: 0,
-      stressLevel: 0,
+      currentSanity: 99,
+      maxSanity: 99,
+      baseSanity: 99,
+      cthulhuMythos: 0,
+      insanityThreshold: 80,
       supernaturalStressMarks: Array(10).fill(false),
       equipment: '',
       attacks: Array(4).fill(''),
