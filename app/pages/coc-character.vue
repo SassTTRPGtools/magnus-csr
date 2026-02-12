@@ -22,16 +22,15 @@
             角色+技能
           </button>
           <button
-            @click="activeTab = 'keys'"
+            @click="showKeysModal = true"
             :class="[
               'px-3 py-2 rounded border text-xs font-typewriter transition-colors',
-              activeTab === 'keys'
-                ? 'bg-green-700 text-white border-green-800'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              'bg-amber-700 text-white border-amber-800 hover:bg-amber-800'
             ]"
           >
-            密鑰&能力
+            📖 密鑰&能力
           </button>
+
         </div>
 
         <!-- 角色頁（含技能） -->
@@ -391,138 +390,153 @@
           </div>
         </div>
 
-        <div v-show="activeTab === 'keys'" class="space-y-6">
-          <!-- 密鑰 -->
-          <div class="character-section mb-6">
-            <div class="border-2 border-black bg-white p-4">
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
-                <div class="flex items-center space-x-2">
-                  <span class="text-xs bg-red-800 text-white px-2 py-1">密鑰上限</span>
-                  <input type="number" v-model.number="character.cypherLimit" min="0" class="w-14 px-2 py-1 border-b border-black bg-transparent text-center font-typewriter text-xs focus:outline-none" placeholder="上限">
-                  <button @click="generateRandomCyphers" 
-                          :disabled="character.cypherLimit <= 0"
-                          :class="[
-                            'text-xs px-2 py-1 rounded font-typewriter',
-                            character.cypherLimit <= 0 
-                              ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                              : 'bg-green-700 text-white hover:bg-green-800'
-                          ]">
-                    隨機獲得
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 密鑰&能力浮動侧邊欄 -->
+  <transition name="slide-right">
+    <div v-if="showKeysModal" class="fixed left-0 top-0 h-screen z-40 bg-white border-r-2 border-black flex flex-col" :style="{ width: keysModalWidth + 'px' }">
+    <!-- 標題欄 -->
+    <div class="flex items-center justify-between p-4 border-b-2 border-black flex-shrink-0">
+      <div class="text-sm font-bold uppercase tracking-wide">密鑰&能力</div>
+      <button @click="showKeysModal = false" class="text-lg font-bold text-gray-700 hover:text-black transition-colors">✕</button>
+    </div>
+    <!-- 內容區 -->
+    <div class="p-4 overflow-y-auto flex-1 space-y-6">
+        <!-- 密鑰部分 -->
+        <div class="character-section">
+          <div class="border-2 border-black bg-white p-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-red-800 text-white px-2 py-1">密鑰上限</span>
+                <input type="number" v-model.number="character.cypherLimit" min="0" class="w-14 px-2 py-1 border-b border-black bg-transparent text-center font-typewriter text-xs focus:outline-none" placeholder="上限">
+                <button @click="generateRandomCyphers" 
+                        :disabled="character.cypherLimit <= 0"
+                        :class="[
+                          'text-xs px-2 py-1 rounded font-typewriter',
+                          character.cypherLimit <= 0 
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                            : 'bg-green-700 text-white hover:bg-green-800'
+                        ]">
+                  隨機獲得
+                </button>
+                <button @click="addNewCypher" 
+                        :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
+                        :class="[
+                          'text-xs px-2 py-1 rounded font-typewriter',
+                          character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                            : 'bg-green-700 text-white hover:bg-green-800'
+                        ]">
+                  + 添加密鑰
+                </button>
+              </div>
+            </div>
+            
+            <!-- 密鑰列表 -->
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+              <div v-for="(cypher, index) in character.cyphers" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                  <button @click="cypher.collapsed = !cypher.collapsed" 
+                          class="flex items-center text-sm font-medium text-gray-700 hover:text-black flex-1 text-left">
+                    <span class="mr-2">{{ cypher.collapsed ? '▶' : '▼' }}</span>
+                    <span>{{ getCypherTitle(cypher.content) || `密鑰 ${index + 1}` }}</span>
                   </button>
-                  <button @click="addNewCypher" 
-                          :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
-                          :class="[
-                            'text-xs px-2 py-1 rounded font-typewriter',
-                            character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
-                              ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                              : 'bg-green-700 text-white hover:bg-green-800'
-                          ]">
-                    + 添加密鑰
-                  </button>
+                  <div class="flex items-center space-x-1">
+                    <button @click="copyCypherToClipboard(cypher)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製密鑰詳細內容">
+                      📋
+                    </button>
+                    <button @click="removeCypher(index)" class="text-red-600 hover:text-red-800 text-xs">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                
+                <div v-if="!cypher.collapsed">
+                  <textarea v-model="cypher.content" 
+                           placeholder="貼上完整密鑰內容，包含標題、等級和效果描述..." 
+                           class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
+                           rows="4"></textarea>
+                </div>
+                
+                <!-- 摺疊時顯示預覽 -->
+                <div v-else-if="cypher.content" class="text-xs text-gray-600 italic truncate">
+                  {{ getCypherPreview(cypher.content) }}
                 </div>
               </div>
               
-              <!-- 密鑰列表 -->
-              <div class="space-y-2 max-h-96 overflow-y-auto">
-                <div v-for="(cypher, index) in character.cyphers" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
-                  <div class="flex items-center justify-between mb-2">
-                    <button @click="cypher.collapsed = !cypher.collapsed" 
-                            class="flex items-center text-sm font-medium text-gray-700 hover:text-black flex-1 text-left">
-                      <span class="mr-2">{{ cypher.collapsed ? '▶' : '▼' }}</span>
-                      <span>{{ getCypherTitle(cypher.content) || `密鑰 ${index + 1}` }}</span>
-                    </button>
-                    <div class="flex items-center space-x-1">
-                      <button @click="copyCypherToClipboard(cypher)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製密鑰詳細內容">
-                        📋
-                      </button>
-                      <button @click="removeCypher(index)" class="text-red-600 hover:text-red-800 text-xs">
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div v-if="!cypher.collapsed">
-                    <textarea v-model="cypher.content" 
-                             placeholder="貼上完整密鑰內容，包含標題、等級和效果描述..." 
-                             class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
-                             rows="4"></textarea>
-                  </div>
-                  
-                  <!-- 摺疊時顯示預覽 -->
-                  <div v-else-if="cypher.content" class="text-xs text-gray-600 italic truncate">
-                    {{ getCypherPreview(cypher.content) }}
-                  </div>
-                </div>
-                
-                <!-- 無密鑰時的提示 -->
-                <div v-if="character.cyphers.length === 0" class="text-center text-gray-500 text-sm py-4">
-                  尚未添加任何密鑰
-                </div>
-                
-                <!-- 密鑰上限提示 -->
-                <div v-if="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit" 
-                     class="text-center text-orange-600 text-xs py-2">
-                  已達密鑰上限 ({{ character.cyphers.length }}/{{ character.cypherLimit }})
-                </div>
+              <!-- 無密鑰時的提示 -->
+              <div v-if="character.cyphers.length === 0" class="text-center text-gray-500 text-sm py-4">
+                尚未添加任何密鑰
+              </div>
+              
+              <!-- 密鑰上限提示 -->
+              <div v-if="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit" 
+                   class="text-center text-orange-600 text-xs py-2">
+                已達密鑰上限 ({{ character.cyphers.length }}/{{ character.cypherLimit }})
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- 能力 -->
-          <div class="character-section">
-            <div class="border-2 border-black bg-white p-4 flex flex-col">
-              <div class="flex items-center justify-between mb-4 flex-shrink-0">
-                <div class="text-center text-sm font-bold uppercase tracking-wide">能力</div>
-                <button @click="addNewAbility" 
-                        class="text-xs px-2 py-1 bg-green-700 text-white hover:bg-green-800 rounded font-typewriter">
-                  + 添加能力
-                </button>
-              </div>
-              
-              <!-- 能力列表 -->
-              <div class="space-y-2 flex-1 overflow-y-auto min-h-0">
-                <div v-for="(ability, index) in character.abilities" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
-                  <div class="flex items-center justify-between mb-2">
-                    <button @click="ability.collapsed = !ability.collapsed" 
-                            class="flex items-center text-sm font-medium text-gray-700 hover:text-black flex-1 text-left">
-                      <span class="mr-2">{{ ability.collapsed ? '▶' : '▼' }}</span>
-                      <span>{{ getAbilityTitle(ability.content) || `能力 ${index + 1}` }}</span>
+        <!-- 能力部分 -->
+        <div class="character-section">
+          <div class="border-2 border-black bg-white p-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-sm font-bold uppercase tracking-wide">能力</div>
+              <button @click="addNewAbility" 
+                      class="text-xs px-2 py-1 bg-green-700 text-white hover:bg-green-800 rounded font-typewriter">
+                + 添加能力
+              </button>
+            </div>
+            
+            <!-- 能力列表 -->
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+              <div v-for="(ability, index) in character.abilities" :key="index" class="border border-gray-300 rounded p-2 bg-gray-50">
+                <div class="flex items-center justify-between mb-2">
+                  <button @click="ability.collapsed = !ability.collapsed" 
+                          class="flex items-center text-sm font-medium text-gray-700 hover:text-black flex-1 text-left">
+                    <span class="mr-2">{{ ability.collapsed ? '▶' : '▼' }}</span>
+                    <span>{{ getAbilityTitle(ability.content) || `能力 ${index + 1}` }}</span>
+                  </button>
+                  <div class="flex items-center space-x-1">
+                    <button @click="copyAbilityToClipboard(ability)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製能力詳細內容">
+                      📋
                     </button>
-                    <div class="flex items-center space-x-1">
-                      <button @click="copyAbilityToClipboard(ability)" class="text-blue-600 hover:text-blue-800 text-xs px-1 py-1 rounded border border-blue-300 hover:bg-blue-50" title="複製能力詳細內容">
-                        📋
-                      </button>
-                      <button @click="removeAbility(index)" class="text-red-600 hover:text-red-800 text-xs">
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div v-if="!ability.collapsed">
-                    <textarea v-model="ability.content" 
-                             placeholder="描述能力的效果、成本和限制..." 
-                             class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
-                             rows="4"></textarea>
-                  </div>
-                  
-                  <!-- 摺疊時顯示預覽 -->
-                  <div v-else-if="ability.content" class="text-xs text-gray-600 italic truncate">
-                    {{ getAbilityPreview(ability.content) }}
+                    <button @click="removeAbility(index)" class="text-red-600 hover:text-red-800 text-xs">
+                      ✕
+                    </button>
                   </div>
                 </div>
                 
-                <!-- 無能力時的提示 -->
-                <div v-if="character.abilities.length === 0" class="text-center text-gray-500 text-sm py-4">
-                  尚未添加任何能力
+                <div v-if="!ability.collapsed">
+                  <textarea v-model="ability.content" 
+                           placeholder="描述能力的效果、成本和限制..." 
+                           class="w-full h-24 text-xs bg-transparent border border-gray-300 rounded p-2 resize-none focus:outline-none focus:border-black font-typewriter"
+                           rows="4"></textarea>
                 </div>
+                
+                <!-- 摺疊時顯示預覽 -->
+                <div v-else-if="ability.content" class="text-xs text-gray-600 italic truncate">
+                  {{ getAbilityPreview(ability.content) }}
+                </div>
+              </div>
+              
+              <!-- 無能力時的提示 -->
+              <div v-if="character.abilities.length === 0" class="text-center text-gray-500 text-sm py-4">
+                尚未添加任何能力
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    <!-- 缩放手柄 -->
+    <div @mousedown="startResizeKeysModal" class="fixed" :style="{ left: (keysModalWidth - 4) + 'px', top: 0, width: '8px', height: '100vh', cursor: 'col-resize', zIndex: 41 }"></div>
   </div>
+  </transition>
 
   <!-- 技能管理 Modal -->
   <div v-if="showSkillsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
@@ -639,8 +653,35 @@ const showCopyNotification = ref(false)
 const copyNotificationText = ref('')
 
 const showSkillsModal = ref(false)
+const showKeysModal = ref(false)
+const keysModalWidth = ref(400)
+const isResizingKeysModal = ref(false)
+const resizeStartX = ref(0)
+const resizeStartWidth = ref(0)
 const specialtyPickers = ref({})
 const activeTab = ref('character')
+
+// 密鑰侧邊欄缩放功能
+const startResizeKeysModal = (e) => {
+  isResizingKeysModal.value = true
+  resizeStartX.value = e.clientX
+  resizeStartWidth.value = keysModalWidth.value
+  document.addEventListener('mousemove', doResizeKeysModal)
+  document.addEventListener('mouseup', stopResizeKeysModal)
+}
+
+const doResizeKeysModal = (e) => {
+  if (!isResizingKeysModal.value) return
+  const diff = e.clientX - resizeStartX.value
+  const newWidth = Math.max(300, Math.min(800, resizeStartWidth.value + diff))
+  keysModalWidth.value = newWidth
+}
+
+const stopResizeKeysModal = () => {
+  isResizingKeysModal.value = false
+  document.removeEventListener('mousemove', doResizeKeysModal)
+  document.removeEventListener('mouseup', stopResizeKeysModal)
+}
 
 // 攻击文本同步
 const attacksText = computed({
@@ -1221,9 +1262,19 @@ const saveToLocalStorage = () => {
 
 const loadFromLocalStorage = () => {
   try {
-    const savedData = localStorage.getItem('magnus-csr-character')
+    const savedData = localStorage.getItem('coc-csr-character')
     if (savedData) {
-      const parsedData = JSON.parse(savedData)
+      let parsedData
+      try {
+        parsedData = JSON.parse(savedData)
+      } catch (jsonError) {
+        console.error('JSON 解析失敗:', jsonError)
+        // 如果 JSON 解析失敗，清除損壞的數據
+        localStorage.removeItem('coc-csr-character')
+        console.warn('已清除損壞的 localStorage 數據')
+        return
+      }
+      
       if (parsedData && Object.prototype.hasOwnProperty.call(parsedData, 'sanityTrack')) {
         delete parsedData.sanityTrack
       }
