@@ -11,21 +11,10 @@
       <div class="flex flex-col gap-4">
         <div class="flex flex-wrap gap-2">
           <button
-            @click="activeTab = 'character'"
-            :class="[
-              'px-3 py-2 rounded border text-xs font-typewriter transition-colors',
-              activeTab === 'character'
-                ? 'bg-green-700 text-white border-green-800'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            ]"
-          >
-            角色+技能
-          </button>
-          <button
             @click="showKeysModal = true"
             :class="[
               'px-3 py-2 rounded border text-xs font-typewriter transition-colors',
-              'bg-amber-700 text-white border-amber-800 hover:bg-amber-800'
+              'text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100'
             ]"
           >
             📖 密鑰&能力
@@ -132,7 +121,7 @@
                       <!-- 複製狀態值按鈕 -->
                       <div class="mt-3 pt-2 border-t border-gray-300">
                         <button @click="copyStatusToClipboard" 
-                                class="w-full text-xs px-2 py-1 bg-blue-600 text-white hover:bg-blue-700 rounded font-typewriter">
+                                class="w-full text-xs px-2 py-1 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                           📋 複製狀態值
                         </button>
                       </div>
@@ -162,7 +151,7 @@
                           <div class="flex items-center justify-center gap-2">
                             <div class="w-16 h-9 flex items-center justify-center text-base font-typewriter font-bold border-2 border-red-600 bg-red-50 rounded">{{ insanityThreshold }}</div>
                             <button @click="resetInsanityThreshold" 
-                                    class="h-9 flex items-center justify-center text-xs font-medium px-3 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
+                                    class="h-9 flex items-center justify-center text-xs font-medium px-3 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100 whitespace-nowrap">
                               重設
                             </button>
                           </div>
@@ -232,20 +221,20 @@
                   <div class="grid grid-cols-2 gap-2 text-xs">
                     <!-- 第一行 -->
                     <button @click="exportToJSON" 
-                            class="px-3 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded font-typewriter">
+                            class="px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                       匯出 JSON
                     </button>
-                    <label class="px-3 py-2 bg-orange-600 text-white hover:bg-orange-700 rounded font-typewriter cursor-pointer text-center">
+                    <label class="px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100 cursor-pointer text-center">
                       匯入 JSON
                       <input type="file" @change="importFromJSON" accept=".json" class="hidden">
                     </label>
                     <!-- 第二行 -->
                     <button @click="exportToText" 
-                            class="px-3 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded font-typewriter">
+                            class="px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                       複製純文字版本
                     </button>
                     <button @click="clearForm" 
-                            class="px-3 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-typewriter">
+                            class="px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                       清空資料
                     </button>
                   </div>
@@ -411,25 +400,25 @@
             <div class="flex items-center justify-between mb-4">
               <div class="text-sm font-bold uppercase tracking-wide">密鑰</div>
               <div class="flex items-center space-x-2">
-                <span class="text-xs bg-red-800 text-white px-2 py-1">密鑰上限</span>
+                <span class="text-xs px-2 py-1 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50">密鑰上限</span>
                 <input type="number" v-model.number="character.cypherLimit" min="0" class="w-14 px-2 py-1 border-b border-black bg-transparent text-center font-typewriter text-xs focus:outline-none" placeholder="上限">
                 <button @click="generateRandomCyphers" 
                         :disabled="character.cypherLimit <= 0"
                         :class="[
-                          'text-xs px-2 py-1 rounded font-typewriter',
+                          'text-xs px-2 py-1 rounded border font-typewriter transition-colors',
                           character.cypherLimit <= 0 
                             ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                            : 'bg-green-700 text-white hover:bg-green-800'
+                            : 'text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100'
                         ]">
                   隨機獲得
                 </button>
                 <button @click="addNewCypher" 
                         :disabled="character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit"
                         :class="[
-                          'text-xs px-2 py-1 rounded font-typewriter',
+                          'text-xs px-2 py-1 rounded border font-typewriter transition-colors',
                           character.cypherLimit > 0 && character.cyphers.length >= character.cypherLimit 
                             ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                            : 'bg-green-700 text-white hover:bg-green-800'
+                            : 'text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100'
                         ]">
                   + 添加密鑰
                 </button>
@@ -488,7 +477,7 @@
             <div class="flex items-center justify-between mb-4">
               <div class="text-sm font-bold uppercase tracking-wide">能力</div>
               <button @click="addNewAbility" 
-                      class="text-xs px-2 py-1 bg-green-700 text-white hover:bg-green-800 rounded font-typewriter">
+                      class="text-xs px-2 py-1 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                 + 添加能力
               </button>
             </div>
@@ -543,7 +532,7 @@
     <div class="bg-white border-2 border-black w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
       <div class="flex items-center justify-between p-4 border-b border-black">
         <div class="text-sm font-bold uppercase tracking-wide">技能管理</div>
-        <button @click="showSkillsModal = false" class="text-xs px-3 py-2 rounded border font-typewriter text-red-700 border-red-300 bg-red-50 hover:bg-red-100">關閉</button>
+        <button @click="showSkillsModal = false" class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">關閉</button>
       </div>
       <div class="p-4 overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
@@ -1563,206 +1552,275 @@ const getTrackDisplayName = (value, type) => {
 </script>
 
 <style scoped>
+/* 克蘇魯朋友主題配色 */
+:root {
+  --cthulhu-parchment: #D4C5B0;  /* 古旧纸张色 */
+  --cthulhu-brown: #6B4423;      /* 深棕色 */
+  --cthulhu-light-brown: #8B5A3C; /* 棕色 */
+  --cthulhu-dark: #2C1810;       /* 深褐色 */
+  --cthulhu-red: #8B1C1C;        /* 血色红 */
+}
+
+/* 全局背景 */
+:deep(.min-h-screen) {
+  background-color: #8B7765 !important;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.03) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 3px
+    ),
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(40, 20, 10, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 80%,
+      rgba(40, 20, 10, 0.1) 0%,
+      transparent 50%
+    );
+}
+
+/* 按鈕樣式 - 克蘇魯風格 */
+:deep(button) {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+:deep(button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+:deep(button:active) {
+  transform: translateY(0);
+}
+
+/* 標籤頁按鈕 */
+:deep(.bg-green-700) {
+  background-color: #2196F3 !important;
+  border-color: #1565C0 !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+:deep(.bg-green-700:hover) {
+  background-color: #42A5F5 !important;
+  transform: translateY(-1px);
+}
+
+/* 按鈕統一使用淺藍邊框風格，與管理按鈕一致 */
+
+/* 字體樣式 */
+:deep(label),
+:deep(.text-xs),
+:deep(.text-sm),
+:deep(.text-base) {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  color: #1a0f08;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+/* 輸入框樣式 */
+:deep(input[type="text"]),
+:deep(input[type="number"]),
+:deep(textarea),
+:deep(select) {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  background-color: #F5EDE0 !important;
+  color: #1a0f08 !important;
+  border-color: #8B5A3C !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+:deep(input[type="text"]:focus),
+:deep(input[type="number"]:focus),
+:deep(textarea:focus),
+:deep(select:focus) {
+  background-color: #FFFAF3 !important;
+  border-color: #A0684C !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 0 8px rgba(160, 104, 76, 0.4);
+  outline: none;
+}
+
+/* 邊框樣式 */
+:deep(.border-black) {
+  border-color: #6B4423 !important;
+  box-shadow: 
+    inset 0 0 15px rgba(0, 0, 0, 0.1),
+    0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.border-b,
+      .border-r) {
+  border-color: #6B4423 !important;
+}
+
+/* 紙質背景 */
+:deep(.bg-white) {
+  background-color: #E8DCC8 !important;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.02) 3px
+    ),
+    radial-gradient(
+      ellipse at 15% 30%,
+      rgba(40, 20, 10, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 85% 75%,
+      rgba(40, 20, 10, 0.06) 0%,
+      transparent 40%
+    );
+}
+
+/* 灰色背景區塊 */
+:deep(.bg-gray-50) {
+  background-color: #F0E6D2 !important;
+  border-color: #C8B8A0 !important;
+}
+
+:deep(.bg-gray-100) {
+  background-color: #E8DCC8 !important;
+}
+
+/* Modal 樣式 */
+:deep(.fixed.inset-0) {
+  background-color: rgba(20, 10, 5, 0.8) !important;
+}
+
+:deep(.border-2.border-black) {
+  border-color: #6B4423 !important;
+  background-color: #DCC8B0 !important;
+}
+
+/* 複製成功提示 */
+:deep(.bg-green-600) {
+  background-color: #8B1C1C !important;
+}
+
+/* 文字顏色 */
+:deep(.text-gray-700) {
+  color: #1a0f08 !important;
+}
+
+:deep(.text-gray-600) {
+  color: #3C2815 !important;
+}
+
+:deep(.text-gray-500) {
+  color: #5C4830 !important;
+}
+
+/* Character Section */
 .character-section {
   margin-bottom: 1rem;
 }
 
-/* 紙張質感 */
 .character-section .border-black {
+  border-color: #6B4423 !important;
   box-shadow: 
-    inset 0 0 20px rgba(0, 0, 0, 0.1),
-    0 2px 10px rgba(0, 0, 0, 0.3);
+    inset 0 0 15px rgba(0, 0, 0, 0.1),
+    0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* 輸入框樣式 */
-input[type="text"], 
-input[type="number"], 
-textarea {
-  font-family: 'Special Elite', 'Courier New', monospace;
+/* 選擇框樣式 */
+:deep(.border-gray-300) {
+  border-color: #B8A890 !important;
+  background-color: #E8DCC8 !important;
 }
 
-input[type="text"]:focus, 
-input[type="number"]:focus, 
-textarea:focus {
-  background-color: rgba(161, 60, 60, 0.05);
+/* 紅色警告樣式 */
+:deep(.bg-red-50) {
+  background-color: #F0E6D2 !important;
 }
 
-/* 標題綠色 */
-h1, h2 {
-  color: #2d5a2d;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+:deep(.bg-red-800) {
+  background-color: #8B1C1C !important;
 }
 
-/* 下拉選單樣式 */
-select {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  background-color: #faf9f7;
+:deep(.border-red-300) {
+  border-color: #CD7F7F !important;
+}
+
+:deep(.text-red-600) {
+  color: #8B1C1C !important;
+}
+
+:deep(.text-red-700) {
+  color: #6B1414 !important;
+}
+
+/* 藍色樣式 */
+:deep(.bg-blue-600) {
+  background-color: #4A4E71 !important;
+}
+
+:deep(.bg-blue-50) {
+  background-color: #E8E8F0 !important;
+}
+
+/* 過渡動畫 */
+:deep(.transition-all) {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:deep(.transition-colors) {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* 陰影效果 */
+:deep(.shadow-lg) {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 複選框樣式 */
+:deep(input[type="checkbox"]) {
+  accent-color: #8B5A3C;
+}
+
+/* Hover 效果 */
+.track-item:hover {
+  background-color: rgba(139, 90, 60, 0.1);
   transition: all 0.2s ease;
 }
 
-select:focus {
-  background-color: rgba(161, 60, 60, 0.05);
-  border-color: #a13c3c;
-}
-
-select option {
-  background-color: #faf9f7;
-  color: inherit;
-}
-
-/* 技能顏色樣式 - 使用 !important 確保優先級 */
-.text-red-600 {
-  color: #dc2626 !important;
-}
-
-.text-green-700 {
-  color: #15803d !important;
-}
-
-.text-blue-700 {
-  color: #1d4ed8 !important;
-}
-
-.text-gray-800 {
-  color: #1f2937 !important;
-}
-
-.text-gray-400 {
-  color: #9ca3af !important;
-}
-
-/* 技能項目懸浮效果 */
-.cursor-pointer:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  transition: background-color 0.2s ease;
-}
-
-/* 編輯狀態樣式 */
-.bg-yellow-50 {
-  background-color: #fefce8;
-}
-
-.border-yellow-300 {
-  border-color: #fde047;
-}
-
-/* 技能等級標籤樣式 */
-.bg-red-50 {
-  background-color: #fef2f2;
-}
-
-.border-red-300 {
-  border-color: #fca5a5;
-}
-
-.bg-green-50 {
-  background-color: #f0fdf4;
-}
-
-.border-green-300 {
-  border-color: #86efac;
-}
-
-.bg-blue-50 {
-  background-color: #eff6ff;
-}
-
-.border-blue-300 {
-  border-color: #93c5fd;
-}
-
-.bg-gray-50 {
-  background-color: #f9fafb;
-}
-
-.border-gray-300 {
-  border-color: #d1d5db;
-}
-
-.text-gray-600 {
-  color: #4b5563;
-}
-
-/* 復古表格樣式 */
-.grid input {
-  transition: all 0.2s ease;
-}
-
-.grid input:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-/* 紙張背景紋理 */
-.bg-white {
-  background-color: #faf9f7;
-  background-image: 
-    radial-gradient(circle at 20% 50%, rgba(120, 119, 109, 0.3) 0%, rgba(255,255,255,0) 50%),
-    radial-gradient(circle at 80% 20%, rgba(120, 119, 109, 0.3) 0%, rgba(255,255,255,0) 50%),
-    radial-gradient(circle at 40% 80%, rgba(120, 119, 109, 0.3) 0%, rgba(255,255,255,0) 50%);
-}
-
-/* 血跡效果 - 可選 */
-.blood-stain::after {
-  content: '';
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  width: 50px;
-  height: 50px;
-  background: radial-gradient(circle, #8b0000 30%, #a52a2a  50%, transparent 70%);
-  border-radius: 50% 30% 60% 40%;
-  opacity: 0.3;
-  transform: rotate(45deg);
-}
-
-/* Magnus Archives 風格的 Tooltip */
-[data-tooltip] {
-  position: relative;
-  cursor: help;
-}
-
+/* 工具提示 */
 [data-tooltip]:hover::before {
   content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-  color: #e5e1d8;
-  padding: 12px 16px;
-  border-radius: 6px;
+  background: #2C1810;
+  color: #E8DCC8;
+  padding: 8px 12px;
+  border-radius: 4px;
   z-index: 9999;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: normal;
-  border: 2px solid #a13c3c;
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    0 0 0 1px rgba(161, 60, 60, 0.4),
-    0 0 20px rgba(161, 60, 60, 0.3);
-  animation: fadeInTooltip 0.3s ease-out;
-  max-width: 280px;
-  min-width: 120px;
-  white-space: normal;
-  line-height: 1.4;
+  border: 1px solid #6B4423;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
   font-family: 'Special Elite', 'Courier New', monospace;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   pointer-events: none;
-  /* 智能邊界檢測 */
-  right: auto;
-}
-
-/* 針對螢幕右側的元素調整工具提示位置 */
-.grid > div:last-child [data-tooltip]:hover::before {
-  left: auto;
-  right: 0;
-  transform: translateX(0);
-}
-
-/* 針對螢幕左側的元素調整工具提示位置 */
-.grid > div:first-child [data-tooltip]:hover::before {
-  left: 0;
-  transform: translateX(0);
 }
 
 [data-tooltip]:hover::after {
@@ -1773,26 +1831,14 @@ select option {
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid #a13c3c;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #2C1810;
   z-index: 9998;
-  animation: fadeInTooltip 0.3s ease-out;
   pointer-events: none;
 }
 
-/* 箭頭位置調整 */
-.grid > div:last-child [data-tooltip]:hover::after {
-  left: auto;
-  right: 20px;
-  transform: translateX(0);
-}
-
-.grid > div:first-child [data-tooltip]:hover::after {
-  left: 20px;
-  transform: translateX(0);
-}
-
+/* 動畫 */
 @keyframes fadeInTooltip {
   from {
     opacity: 0;
@@ -1804,33 +1850,41 @@ select option {
   }
 }
 
-/* 傷害軌項目懸浮效果 */
-.track-item:hover {
-  background-color: rgba(161, 60, 60, 0.1);
-  border-radius: 2px;
-  transition: all 0.2s ease;
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
-/* 壓力方格特殊樣式 */
-.bg-black input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.bg-black input[type="checkbox"]:checked {
-  background-color: #000000;
-  border: 2px solid #ffffff;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.bg-black input[type="checkbox"]:checked::after {
-  content: '✓';
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-right-enter-from,
+.slide-right-leave-to {
+  transform: translateX(-100%);
 }
 </style>
