@@ -192,11 +192,7 @@
                   <div class="text-xs space-y-1">
                     <label class="flex items-center">
                       <input type="checkbox" class="mr-2">
-                      <span>提升數值：獲得 4 點數值，能自由分配到任意屬性中。</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input type="checkbox" class="mr-2">
-                      <span>邁向完美：將選擇氣力、速度或智力一項 +1。</span>
+                      <span>邁向完美：選擇氣力、速度或智力一項節省值 +1。</span>
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" class="mr-2">
@@ -204,7 +200,7 @@
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" class="mr-2">
-                      <span>技能：選擇一項新技能（攻擊與防禦除外）受訓。 或者將受訓技能改為專精。</span>
+                      <span>技能：提升滿經歷點的技能組中的一項技能。</span>
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" class="mr-2">
@@ -329,12 +325,16 @@
               <!-- 技能 -->
               <div class="character-section mb-6">
                 <div class="border-2 border-black bg-white p-4">
-                  <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center justify-between mb-2">
                     <div class="text-sm font-bold uppercase tracking-wide">技能</div>
                     <button @click="showSkillsModal = true" 
                             class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                       管理
                     </button>
+                  </div>
+                  <div class="text-xs text-gray-600 font-typewriter mb-4">
+                    <span class="mr-3">外行🤡：需花費額外1級努力</span>
+                    <span>大師🎖️：可獲得免費1級努力</span>
                   </div>
                   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3 bg-gray-50">
@@ -537,10 +537,6 @@
       <div class="p-4 overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <div class="text-xs font-bold">技能管理</div>
-          <div class="text-xs text-gray-600 font-typewriter">
-            <span class="mr-3">外行🤡：需花費額外1級努力</span>
-            <span>大師🎖️：可獲得免費1級努力</span>
-          </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3">
@@ -742,9 +738,9 @@ function buildDefaultSkills () {
   { id: 'charm', name: '魅力', category: 'social', level: 'outsider' },
   { id: 'fast-talk', name: '話術', category: 'social', level: 'outsider' },
   { id: 'intimidate', name: '威脅', category: 'social', level: 'outsider' },
-  { id: 'persuade', name: '說服', category: 'social', level: 'outsider' },
-  { id: 'credit', name: '信用評級', category: 'social', level: 'outsider' },
+  { id: 'persuade', name: '說服', category: 'social', level: 'outsider' },  
   { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造', '攝影'] },
+  { id: 'credit', name: '信用評級', category: 'social', level: 'outsider' },
 
   // 調查 (Investigation)
   { id: 'library', name: '圖書館使用', category: 'investigation', level: 'amateur' },
