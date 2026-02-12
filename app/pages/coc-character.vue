@@ -48,8 +48,8 @@
 
         <!-- 角色頁（含技能） -->
         <div v-show="activeTab === 'character'">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="space-y-6 lg:col-span-1">
               <!-- 角色基本資訊 -->
               <div class="character-section mb-6">
                 <div class="border-2 border-black bg-white p-4">
@@ -368,7 +368,7 @@
               </div>
             </div>
 
-            <div class="space-y-6">
+            <div class="space-y-6 lg:col-span-2">
               <!-- 技能 -->
               <div class="character-section mb-6">
                 <div class="border-2 border-black bg-white p-4">
@@ -385,28 +385,28 @@
                       </button>
                     </div>
                   </div>
-                  <div class="text-xs text-gray-700 mb-3 leading-relaxed">
+                  <div class="text-sm text-gray-700 mb-4 leading-relaxed">
                     <div>外行🤡：額外努力 1 級</div>
                     <div>大師🎖️：免費努力 1 級</div>
                   </div>
-                  <div class="grid grid-cols-1 gap-3">
-                    <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-2 bg-gray-50">
-                      <div class="text-xs font-bold mb-2">{{ category.icon }} {{ category.label }}</div>
-                      <div class="space-y-1">
-                        <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="text-xs border-b border-gray-200 pb-2">
+                  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3 bg-gray-50">
+                      <div class="text-sm font-bold mb-2">{{ category.icon }} {{ category.label }}</div>
+                      <div class="space-y-2">
+                        <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="text-sm border-b border-gray-200 pb-2">
                           <div class="flex items-start justify-between">
                             <div class="pr-2">
                               <div class="font-medium">{{ skill && skill.name }}</div>
                               <div v-if="skill && skill.note" class="text-gray-600">{{ skill.note }}</div>
                             </div>
-                            <span v-if="skill && getSkillDisplayLevel(skill)" :class="getSkillLevelBadgeClass(skill.level)" class="px-2 py-0.5 rounded border text-[10px] whitespace-nowrap">
+                            <span v-if="skill && getSkillDisplayLevel(skill)" :class="getSkillLevelBadgeClass(skill.level)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
                               {{ getSkillDisplayLevel(skill) }}
                             </span>
                           </div>
-                          <div v-if="skill && getVisibleSpecialties(skill).length" class="mt-1 space-y-1">
-                            <div v-for="(spec, specIndex) in getVisibleSpecialties(skill)" :key="specIndex" class="flex items-start justify-between text-[11px]">
+                          <div v-if="skill && getVisibleSpecialties(skill).length" class="mt-2 space-y-1">
+                            <div v-for="(spec, specIndex) in getVisibleSpecialties(skill)" :key="specIndex" class="flex items-start justify-between text-xs">
                               <div class="text-gray-700">- {{ spec && spec.name }}</div>
-                              <span v-if="spec" :class="getSkillLevelBadgeClass(spec.level)" class="px-2 py-0.5 rounded border text-[10px] whitespace-nowrap">
+                              <span v-if="spec" :class="getSkillLevelBadgeClass(spec.level)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
                                 {{ getSkillLevelLabel(spec.level) }}
                               </span>
                             </div>
