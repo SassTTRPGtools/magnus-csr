@@ -188,23 +188,27 @@
               <!-- 進階 -->
               <div class="character-section">
                 <div class="border-2 border-black bg-white p-4">
-                  <div class="text-xs font-bold uppercase tracking-wide mb-3">晉升位階（完成任意四項）</div>
+                  <div class="text-xs font-bold uppercase tracking-wide mb-3">晉升位階（完成任意四次）</div>
                   <div class="text-xs space-y-1">
                     <label class="flex items-center">
-                      <input type="checkbox" class="mr-2">
+                      <input type="checkbox" v-model="character.advancementChecks.perfection" class="mr-2">
                       <span>邁向完美：選擇氣力、速度或智力一項節省值 +1。</span>
                     </label>
                     <label class="flex items-center">
-                      <input type="checkbox" class="mr-2">
+                      <input type="checkbox" v-model="character.advancementChecks.effort" class="mr-2">
                       <span>額外努力：將努力值 +1。</span>
                     </label>
                     <label class="flex items-center">
-                      <input type="checkbox" class="mr-2">
+                      <input type="checkbox" v-model="character.advancementChecks.skill" class="mr-2">
                       <span>技能：提升滿經歷點的技能組中的一項技能。</span>
                     </label>
                     <label class="flex items-center">
-                      <input type="checkbox" class="mr-2">
-                      <span>其他選項：見規則書。</span>
+                      <input type="checkbox" v-model="character.advancementChecks.ability" class="mr-2">
+                      <span>新能力：從你的當前或更低階層中選擇一項基於類型的新能力。</span>
+                    </label>
+                    <label class="flex items-center">
+                      <input type="checkbox" v-model="character.advancementChecks.recovery" class="mr-2">
+                      <span>提升恢復：你的恢復額外 +2。</span>
                     </label>
                   </div>
                 </div>
@@ -635,6 +639,14 @@ const character = ref({
   xp: 0,
   background: '',
   recoveryBonus: 0
+  ,
+  advancementChecks: {
+    perfection: false,
+    effort: false,
+    skill: false,
+    ability: false,
+    recovery: false
+  }
 })
 
 // 複製提示狀態
@@ -1234,6 +1246,14 @@ const clearForm = () => {
       xp: 0,
       background: '',
       recoveryBonus: 0
+      ,
+      advancementChecks: {
+        perfection: false,
+        effort: false,
+        skill: false,
+        ability: false,
+        recovery: false
+      }
     }
     showCopySuccess('所有資料已清空，可以建立新角色了！')
   }
@@ -1303,6 +1323,13 @@ const loadFromLocalStorage = () => {
         xp: 0,
         background: '',
         recoveryBonus: 0,
+        advancementChecks: {
+          perfection: false,
+          effort: false,
+          skill: false,
+          ability: false,
+          recovery: false
+        },
         ...parsedData, // 覆蓋已儲存的資料
         skills: processedSkills
       }
