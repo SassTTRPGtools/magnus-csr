@@ -232,67 +232,47 @@
                       </div>
                     </div>
 
-                    <!-- 壓力（中欄） -->
+                    <!-- 理智值（中欄） -->
                     <div class="border-r border-gray-300 pr-3 relative">
-                      <!-- 上方壓力標題區 -->
+                      <!-- 理智值區域 -->
                       <div class="mb-3">
-                        <!-- 壓力圓形血跡背景 -->
-                        <div class="relative mb-2">
-                          <div class="w-16 h-16 mx-auto relative">
-                            <!-- 血跡背景 -->
-                            <div class="absolute inset-0 bg-red-900 rounded-full transform rotate-12" style="clip-path: polygon(20% 0%, 100% 30%, 90% 90%, 10% 100%, 0% 60%)"></div>
-                            <div class="absolute inset-1 bg-red-800 rounded-full transform -rotate-6" style="clip-path: polygon(30% 10%, 95% 25%, 85% 85%, 15% 95%, 5% 65%)"></div>
-                            <!-- 中心白色方框 -->
-                            <div class="absolute inset-3 bg-white border-2 border-black flex items-center justify-center">
-                              <input type="number" v-model.number="character.currentStress" 
-                                     class="w-full text-center font-bold text-sm bg-transparent border-none focus:outline-none">
-                            </div>
-                            <!-- STRESS 標籤 -->
-                            <div class="absolute -top-1 -left-1 bg-red-900 text-white text-xs font-bold px-1 py-0.5 transform -rotate-12 rounded">
-                              壓力
+                        <div class="text-center mb-2">
+                          <div class="text-xs font-bold uppercase tracking-wide mb-1">理智值 (SAN)</div>
+                          <div class="flex items-center justify-center gap-2">
+                            <input type="text" 
+                                   :value="character.currentSanity || 0"
+                                   @input="e => { character.currentSanity = Number(e.target.value) || 0; saveCharacter(); }"
+                                   class="w-12 h-9 text-center font-typewriter font-bold text-base border-2 border-black rounded py-1.5">
+                            <span class="font-bold text-lg">/</span>
+                            <div class="w-12 h-9 flex items-center justify-center font-typewriter font-bold text-base border-2 border-gray-400 bg-gray-100 rounded">
+                              {{ character.maxSanity || 0 }}
                             </div>
                           </div>
                         </div>
 
-                        <!-- 壓力等級圓形血跡背景 -->
-                        <div class="relative">
-                          <div class="w-16 h-16 mx-auto relative">
-                            <!-- 血跡背景 -->
-                            <div class="absolute inset-0 bg-red-900 rounded-full transform -rotate-12" style="clip-path: polygon(15% 5%, 95% 20%, 100% 80%, 20% 95%, 0% 50%)"></div>
-                            <div class="absolute inset-1 bg-red-800 rounded-full transform rotate-8" style="clip-path: polygon(25% 15%, 90% 30%, 95% 75%, 25% 90%, 10% 55%)"></div>
-                            <!-- 中心白色方框 -->
-                            <div class="absolute inset-3 bg-white border-2 border-black flex items-center justify-center">
-                              <input type="number" v-model.number="character.stressLevel" 
-                                     class="w-full text-center font-bold text-sm bg-transparent border-none focus:outline-none">
-                            </div>
-                            <!-- STRESS LEVEL 標籤 -->
-                            <div class="absolute -top-1 -right-1 bg-red-900 text-white text-xs font-bold px-1 py-0.5 transform rotate-12 rounded text-center leading-tight">
-                              壓力量級
-                            </div>
+                        <!-- 瘋狂閾值 -->
+                        <div class="text-center mb-2">
+                          <div class="text-xs font-bold uppercase tracking-wide mb-1">瘋狂閾值</div>
+                          <div class="flex items-center justify-center gap-2">
+                            <div class="w-16 h-9 flex items-center justify-center text-base font-typewriter font-bold border-2 border-red-600 bg-red-50 rounded">{{ insanityThreshold }}</div>
+                            <button @click="resetInsanityThreshold" 
+                                    class="h-9 flex items-center justify-center text-xs font-medium px-3 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
+                              重設
+                            </button>
                           </div>
+                        </div>
+
+                        <!-- 克蘇魯神話 -->
+                        <div class="text-center">
+                          <div class="text-xs font-bold uppercase tracking-wide mb-1">克蘇魯神話</div>
+                          <input type="text" 
+                                 :value="character.cthulhuMythos || 0"
+                                 @input="e => { character.cthulhuMythos = Number(e.target.value) || 0; updateMaxSanity(); }"
+                                 class="w-16 h-9 text-center font-typewriter font-bold text-base border-2 border-purple-600 rounded py-1.5">
+                          <div class="text-[10px] text-gray-600 mt-0.5">減少理智上限</div>
                         </div>
                       </div>
 
-                      <!-- 黑色背景的方格區域 -->
-                      <div class="bg-black p-2 rounded">
-                        <!-- 白色標題 -->
-                        <div class="text-white text-xs font-bold text-center mb-1 uppercase tracking-wide leading-tight">
-                          源自超自然來源<br>的壓力值
-                        </div>
-                        
-                        <!-- 5x2 白色方格 -->
-                        <div class="grid grid-cols-5 gap-1">
-                          <div v-for="level in 10" :key="level" 
-                            class="w-5 h-5 border border-gray-300 relative"
-                            :style="character.supernaturalStressMarks[level-1] ? 'background-color:#2d5a2d;' : 'background-color:#fff;'">
-                            <input type="checkbox" v-model="character.supernaturalStressMarks[level-1]" 
-                                   class="w-full h-full opacity-0 absolute left-0 top-0 cursor-pointer">
-                            <span v-if="character.supernaturalStressMarks[level-1]" class="absolute left-0 top-0 w-full h-full flex items-center justify-center pointer-events-none">
-                              <svg width="14" height="14" viewBox="0 0 18 18"><polyline points="4,10 8,14 14,6" stroke="white" stroke-width="2.5" fill="none"/></svg>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
                     </div>
 
                   </div>
@@ -636,8 +616,11 @@ const character = ref({
     tenHours: false
   },
   damageTrack: 'hale',
-  currentStress: 0,
-  stressLevel: 0,
+  currentSanity: 99,
+  maxSanity: 99,
+  baseSanity: 99,
+  cthulhuMythos: 0,
+  insanityThreshold: 80,
   supernaturalStressMarks: Array(10).fill(false),
   equipment: '',
   attacks: Array(4).fill(''),
@@ -657,6 +640,25 @@ const copyNotificationText = ref('')
 const showSkillsModal = ref(false)
 const specialtyPickers = ref({})
 const activeTab = ref('character')
+
+const insanityThreshold = computed(() => {
+  return character.value.insanityThreshold || 0
+})
+
+const resetInsanityThreshold = () => {
+  character.value.insanityThreshold = Math.ceil(character.value.currentSanity * 4 / 5)
+  saveCharacter()
+}
+
+const updateMaxSanity = () => {
+  const mythos = Number(character.value.cthulhuMythos) || 0
+  character.value.maxSanity = 99 - mythos
+  if (character.value.maxSanity < 0) character.value.maxSanity = 0
+  if (character.value.currentSanity > character.value.maxSanity) {
+    character.value.currentSanity = character.value.maxSanity
+  }
+  saveCharacter()
+}
 
 
 const skillLevelOptions = [
@@ -732,7 +734,6 @@ function buildDefaultSkills () {
   { id: 'science', name: '科學', category: 'knowledge', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['天文學', '生物學', '植物學', '化學', '經濟學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'] },
   { id: 'occult', name: '神祕學', category: 'knowledge', level: 'outsider' },  
   { id: 'accounting', name: '會計', category: 'knowledge', level: 'outsider' },  
-  { id: 'cthulhu-mythos', name: '克蘇魯神話*', category: 'knowledge', level: 'outsider' },
   
   ]
 }
@@ -1153,7 +1154,7 @@ watch(character, () => {
 
 const saveCharacter = () => {
   console.log('角色資料:', character.value)
-  alert('角色已儲存！（目前只儲存在瀏覽器 console）')
+  // alert('角色已儲存！（目前只儲存在瀏覽器 console）')
 }
 
 const clearForm = () => {
@@ -1231,8 +1232,11 @@ const loadFromLocalStorage = () => {
           tenHours: false
         },
         damageTrack: 'hale',
-        currentStress: 0,
-        stressLevel: 0,
+        currentSanity: 99,
+        maxSanity: 99,
+        baseSanity: 99,
+        cthulhuMythos: 0,
+        insanityThreshold: 80,
         supernaturalStressMarks: Array(10).fill(false),
         equipment: '',
         attacks: Array(4).fill(''),
@@ -1245,6 +1249,32 @@ const loadFromLocalStorage = () => {
         recoveryBonus: 0,
         ...parsedData, // 覆蓋已儲存的資料
         skills: processedSkills
+      }
+      
+      // 確保新字段有預設值
+      if (character.value.currentSanity === undefined || character.value.currentSanity === null) {
+        character.value.currentSanity = 99
+      }
+      if (character.value.baseSanity === undefined || character.value.baseSanity === null) {
+        character.value.baseSanity = 99
+      }
+      if (character.value.cthulhuMythos === undefined || character.value.cthulhuMythos === null) {
+        character.value.cthulhuMythos = 0
+      }
+      
+      // 重新計算 maxSanity
+      const mythos = Number(character.value.cthulhuMythos) || 0
+      character.value.maxSanity = 99 - mythos
+      if (character.value.maxSanity < 0) character.value.maxSanity = 0
+      
+      // 確保 currentSanity 不超過 maxSanity
+      if (character.value.currentSanity > character.value.maxSanity) {
+        character.value.currentSanity = character.value.maxSanity
+      }
+      
+      // 重新計算瘋狂閾值
+      if (character.value.insanityThreshold === undefined || character.value.insanityThreshold === null) {
+        character.value.insanityThreshold = Math.ceil(character.value.currentSanity * 4 / 5)
       }
       
       // 確保陣列長度正確
@@ -1345,8 +1375,8 @@ const exportToText = async () => {
 
 【狀態軌】
 傷害軌：${getTrackDisplayName(character.value.damageTrack, 'damage')}
-壓力：${character.value.currentStress}　壓力量級：${character.value.stressLevel}
-超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10
+理智值：${character.value.currentSanity}/${character.value.maxSanity}　瘋狂閾值：${character.value.insanityThreshold}
+克蘇魯神話：${character.value.cthulhuMythos}　超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10
 
 【攻擊】
 ${nonEmptyAttacks.length > 0 ? 
@@ -1427,8 +1457,8 @@ const copyStatusToClipboard = async () => {
 
 【狀態軌】
 傷害軌：${getTrackDisplayName(character.value.damageTrack, 'damage')}
-壓力：${character.value.currentStress}　壓力量級：${character.value.stressLevel}
-超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10`
+理智值：${character.value.currentSanity}/${character.value.maxSanity}　瘋狂閾值：${character.value.insanityThreshold}
+克蘇魯神話：${character.value.cthulhuMythos}　超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10`
 
   try {
     await navigator.clipboard.writeText(statusText)
