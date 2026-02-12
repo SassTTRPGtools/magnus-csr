@@ -537,6 +537,10 @@
       <div class="p-4 overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <div class="text-xs font-bold">技能管理</div>
+          <div class="text-xs text-gray-600 font-typewriter">
+            <span class="mr-3">外行🤡：需花費額外1級努力</span>
+            <span>大師🎖️：可獲得免費1級努力</span>
+          </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3">
