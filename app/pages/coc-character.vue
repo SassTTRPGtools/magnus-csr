@@ -22,18 +22,6 @@
             角色+技能
           </button>
           <button
-            @click="activeTab = 'skills'"
-            :class="[
-              'px-3 py-2 rounded border text-xs font-typewriter transition-colors',
-              activeTab === 'skills'
-                ? 'bg-green-700 text-white border-green-800'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            ]"
-            disabled
-          >
-            （停用）
-          </button>
-          <button
             @click="activeTab = 'keys'"
             :class="[
               'px-3 py-2 rounded border text-xs font-typewriter transition-colors',
@@ -374,20 +362,10 @@
                 <div class="border-2 border-black bg-white p-4">
                   <div class="flex items-center justify-between mb-4">
                     <div class="text-sm font-bold uppercase tracking-wide">技能</div>
-                    <div class="flex items-center space-x-2">
-                      <label class="flex items-center text-xs">
-                        <input type="checkbox" v-model="hideOutsiderSkills" class="mr-1 scale-90">
-                        <span>隱藏外行</span>
-                      </label>
-                      <button @click="showSkillsModal = true" 
-                              class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
-                        管理
-                      </button>
-                    </div>
-                  </div>
-                  <div class="text-sm text-gray-700 mb-4 leading-relaxed">
-                    <div>外行🤡：額外努力 1 級</div>
-                    <div>大師🎖️：免費努力 1 級</div>
+                    <button @click="showSkillsModal = true" 
+                            class="text-xs px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
+                      管理
+                    </button>
                   </div>
                   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3 bg-gray-50">
@@ -396,7 +374,7 @@
                         <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="text-sm border-b border-gray-200 pb-2">
                           <div class="flex items-start justify-between">
                             <div class="pr-2">
-                              <div class="font-medium">{{ skill && skill.name }}</div>
+                              <div class="font-medium" :data-tooltip="skill ? getSkillTooltip(skill) : ''">{{ skill && skill.name }}</div>
                               <div v-if="skill && skill.note" class="text-gray-600">{{ skill.note }}</div>
                             </div>
                             <span v-if="skill && getSkillDisplayLevel(skill)" :class="getSkillLevelBadgeClass(skill.level)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
@@ -574,14 +552,7 @@
       </div>
       <div class="p-4 overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
-          <div class="text-xs text-gray-700 leading-relaxed">
-            <div>外行🤡：額外努力 1 級</div>
-            <div>大師🎖️：免費努力 1 級</div>
-          </div>
-          <label class="flex items-center text-xs">
-            <input type="checkbox" v-model="hideOutsiderSkills" class="mr-1 scale-90">
-            <span>隱藏外行</span>
-          </label>
+          <div class="text-xs font-bold">技能管理</div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div v-for="category in skillCategories" :key="category.id" class="border border-gray-200 rounded p-3">
@@ -597,6 +568,17 @@
                 </select>
                 <div v-if="skill && skill.allowSpecialties" class="space-y-2">
                   <div class="text-[11px] text-gray-600">專精</div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <select
+                      v-model="specialtyPickers[skill.id]"
+                      @change="addSpecialtyFromOption(skill, specialtyPickers[skill.id]); specialtyPickers[skill.id] = ''"
+                      class="text-xs border border-gray-300 rounded px-2 py-1 font-typewriter focus:outline-none focus:border-black bg-gray-50">
+                      <option value="">新增專精...</option>
+                      <option v-for="option in getAvailableSpecialtyOptions(skill)" :key="option" :value="option">
+                        {{ option }}
+                      </option>
+                    </select>
+                  </div>
                   <div v-for="(spec, specIndex) in (Array.isArray(skill.specialties) ? skill.specialties.filter(s => s && s.name !== undefined) : [])" :key="specIndex" class="flex flex-wrap items-center gap-2">
                     <input
                       v-model="spec.name"
@@ -611,9 +593,6 @@
                       移除
                     </button>
                   </div>
-                  <button @click="addSpecialty(skill)" class="text-xs text-blue-700 border border-blue-300 rounded px-2 py-1 hover:bg-blue-50">
-                    + 新增專精
-                  </button>
                 </div>
               </div>
               <div v-if="(visibleGroupedSkills[category.id] || []).length === 0" class="text-xs text-gray-500">無技能</div>
@@ -676,8 +655,9 @@ const showCopyNotification = ref(false)
 const copyNotificationText = ref('')
 
 const showSkillsModal = ref(false)
+const specialtyPickers = ref({})
 const activeTab = ref('character')
-const hideOutsiderSkills = ref(false)
+
 
 const skillLevelOptions = [
   { value: 'outsider', label: '外行🤡', mod: '-1' },
@@ -689,61 +669,71 @@ const skillLevelOptions = [
 ]
 
 const skillCategories = [
-  { id: 'might', label: '氣力 (Might)', icon: '🔴' },
-  { id: 'speed', label: '速度 (Speed)', icon: '🔵' },
-  { id: 'intellect', label: '智力 (Intellect)', icon: '🟣' }
+  { id: 'combat', label: '戰鬥', icon: '⚔️' },
+  { id: 'social', label: '社交', icon: '💬' },
+  { id: 'investigation', label: '調查', icon: '🔍' },
+  { id: 'technical', label: '技術', icon: '🔧' },
+  { id: 'survival', label: '生存', icon: '🏕️' },
+  { id: 'knowledge', label: '知識', icon: '📚' }
 ]
-
-function createSpecialties (names, level) {
-  if (!Array.isArray(names)) return []
-  return names.filter(Boolean).map(name => ({ name, level }))
-}
 
 function buildDefaultSkills () {
   return [
-  { id: 'combat', name: '戰鬥', category: 'might', level: 'amateur', allowSpecialties: true, specialties: createSpecialties(['斧頭', '鬥毆', '鏈鋸', '連枷', '絞索', '斧', '劍', '鞭子'], 'amateur') },
-  { id: 'throwing', name: '投擲', category: 'might', level: 'amateur' },
-  { id: 'climb', name: '攀爬', category: 'might', level: 'amateur' },
-  { id: 'jump', name: '跳躍', category: 'might', level: 'amateur' },
-  { id: 'swim', name: '游泳', category: 'might', level: 'amateur' },
-  { id: 'track', name: '追蹤', category: 'might', level: 'outsider' },
-  { id: 'heavy-machinery', name: '操作重機', category: 'might', level: 'outsider' },
-  { id: 'first-aid', name: '急救', category: 'might', level: 'amateur' },
-  { id: 'survival', name: '生存', category: 'might', level: 'outsider' },
-  { id: 'nature', name: '自然世界', category: 'might', level: 'outsider' },
-  { id: 'firearms', name: '火器', category: 'speed', level: 'outsider', allowSpecialties: true, specialties: createSpecialties(['弓', '手槍', '重武器', '火焰發射器', '機關槍', '步槍／霰彈槍', '衝鋒槍'], 'outsider') },
-  { id: 'dodge', name: '閃避', category: 'speed', level: 'outsider' },
-  { id: 'stealth', name: '隱匿', category: 'speed', level: 'amateur' },
-  { id: 'disguise', name: '偽裝', category: 'speed', level: 'outsider' },
-  { id: 'sleight-of-hand', name: '巧手', category: 'speed', level: 'outsider' },
-  { id: 'locksmith', name: '鎖匠', category: 'speed', level: 'outsider' },
-  { id: 'drive', name: '駕駛', category: 'speed', level: 'outsider' },
-  { id: 'car', name: '開車', category: 'speed', level: 'amateur' },
-  { id: 'electrical-repair', name: '電器維修', category: 'speed', level: 'outsider' },
-  { id: 'mechanical-repair', name: '機械維修', category: 'speed', level: 'outsider' },
-  { id: 'accounting', name: '會計', category: 'intellect', level: 'outsider' },
-  { id: 'anthropology', name: '人類學', category: 'intellect', level: 'outsider' },
-  { id: 'appraise', name: '鑑定', category: 'intellect', level: 'outsider' },
-  { id: 'archaeology', name: '考古學', category: 'intellect', level: 'outsider' },
-  { id: 'art', name: '藝術／工藝', category: 'intellect', level: 'outsider', allowSpecialties: true, specialties: createSpecialties(['表演', '美術', '偽造', '攝影'], 'outsider') },
-  { id: 'charm', name: '魅力', category: 'intellect', level: 'outsider' },
-  { id: 'credit', name: '信用評級', category: 'intellect', level: 'outsider' },
-  { id: 'fast-talk', name: '話術', category: 'intellect', level: 'outsider' },
-  { id: 'history', name: '歷史', category: 'intellect', level: 'outsider' },
-  { id: 'law', name: '法律', category: 'intellect', level: 'outsider' },
-  { id: 'library', name: '圖書館使用', category: 'intellect', level: 'amateur' },
-  { id: 'listen', name: '聆聽', category: 'intellect', level: 'amateur' },
-  { id: 'medicine', name: '醫藥', category: 'intellect', level: 'outsider' },
-  { id: 'navigate', name: '導航', category: 'intellect', level: 'outsider' },
-  { id: 'occult', name: '神祕學', category: 'intellect', level: 'outsider' },
-  { id: 'persuade', name: '說服', category: 'intellect', level: 'outsider' },
-  { id: 'psychology', name: '心理學', category: 'intellect', level: 'outsider' },
-  { id: 'psychoanalysis', name: '精神分析', category: 'intellect', level: 'outsider' },
-  { id: 'science', name: '科學', category: 'intellect', level: 'outsider', allowSpecialties: true, specialties: createSpecialties(['天文學', '生物學', '植物學', '化學', '經濟學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'], 'outsider') },
-  { id: 'language', name: '語言', category: 'intellect', level: 'outsider', allowSpecialties: true, specialties: [], specialtyPlaceholder: '外語自填' },
-  { id: 'native-language', name: '母語', category: 'intellect', level: 'pro', note: '熟練' },
-  { id: 'intimidate', name: '威脅', category: 'intellect', level: 'outsider' },
-  { id: 'cthulhu-mythos', name: '克蘇魯神話*', category: 'intellect', level: 'outsider' }
+  // 戰鬥 (Combat)
+  { id: 'combat', name: '戰鬥', category: 'combat', level: 'amateur', allowSpecialties: true, specialties: [], specialtyOptions: ['斧頭', '鬥毆', '鏈鋸', '連枷', '絞索', '斧', '劍', '鞭子'] },
+  { id: 'firearms', name: '火器', category: 'combat', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['弓', '手槍', '重武器', '火焰發射器', '機關槍', '步槍／霰彈槍', '衝鋒槍'] },
+  { id: 'dodge', name: '閃避', category: 'combat', level: 'outsider' },
+  { id: 'throwing', name: '投擲', category: 'combat', level: 'amateur' },
+  { id: 'first-aid', name: '急救', category: 'combat', level: 'amateur' },
+
+  // 社交 (Social)
+  { id: 'charm', name: '魅力', category: 'social', level: 'outsider' },
+  { id: 'fast-talk', name: '話術', category: 'social', level: 'outsider' },
+  { id: 'intimidate', name: '威脅', category: 'social', level: 'outsider' },
+  { id: 'persuade', name: '說服', category: 'social', level: 'outsider' },
+  { id: 'credit', name: '信用評級', category: 'social', level: 'outsider' },
+  { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造', '攝影'] },
+
+  // 調查 (Investigation)
+  { id: 'library', name: '圖書館使用', category: 'investigation', level: 'amateur' },
+  { id: 'listen', name: '聆聽', category: 'investigation', level: 'amateur' },
+  { id: 'observe', name: '偵查', category: 'investigation', level: 'amateur' },
+  { id: 'navigate', name: '導航', category: 'investigation', level: 'outsider' },
+  { id: 'track', name: '追蹤', category: 'investigation', level: 'outsider' },
+  { id: 'appraise', name: '鑑定', category: 'investigation', level: 'outsider' },
+  { id: 'psychology', name: '心理學', category: 'investigation', level: 'outsider' },
+  { id: 'psychoanalysis', name: '精神分析', category: 'investigation', level: 'outsider' },
+
+  // 技術 (Technical)
+  { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider' },
+  { id: 'car', name: '開車', category: 'technical', level: 'amateur' },
+  { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'outsider' },
+  { id: 'mechanical-repair', name: '機械維修', category: 'technical', level: 'outsider' },
+  { id: 'stealth', name: '隱匿', category: 'technical', level: 'amateur' },
+  { id: 'disguise', name: '偽裝', category: 'technical', level: 'outsider' },
+  { id: 'sleight-of-hand', name: '巧手', category: 'technical', level: 'outsider' },
+  { id: 'locksmith', name: '鎖匠', category: 'technical', level: 'outsider' },
+  { id: 'heavy-machinery', name: '操作重機', category: 'technical', level: 'outsider' },
+
+  // 生存 (Survival)
+  { id: 'survival', name: '生存', category: 'survival', level: 'outsider' },
+  { id: 'climb', name: '攀爬', category: 'survival', level: 'amateur' },
+  { id: 'jump', name: '跳躍', category: 'survival', level: 'amateur' },
+  { id: 'swim', name: '游泳', category: 'survival', level: 'amateur' },
+  { id: 'nature', name: '自然世界', category: 'survival', level: 'outsider' },
+  { id: 'language', name: '語言', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['母語', '外語（自填）'], specialtyPlaceholder: '語言名稱' },
+
+  // 知識 (Knowledge)
+  { id: 'history', name: '歷史', category: 'knowledge', level: 'outsider' },
+  { id: 'archaeology', name: '考古學', category: 'knowledge', level: 'outsider' },
+  { id: 'anthropology', name: '人類學', category: 'knowledge', level: 'outsider' },
+  { id: 'law', name: '法律', category: 'knowledge', level: 'outsider' },
+  { id: 'medicine', name: '醫藥', category: 'knowledge', level: 'outsider' },
+  { id: 'science', name: '科學', category: 'knowledge', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['天文學', '生物學', '植物學', '化學', '經濟學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'] },
+  { id: 'occult', name: '神祕學', category: 'knowledge', level: 'outsider' },  
+  { id: 'accounting', name: '會計', category: 'knowledge', level: 'outsider' },  
+  { id: 'cthulhu-mythos', name: '克蘇魯神話*', category: 'knowledge', level: 'outsider' },
+  
   ]
 }
 
@@ -797,6 +787,9 @@ const normalizeSkills = (rawSkills) => {
     if (raw.specialties !== undefined) {
       target.specialties = normalizeSpecialties(raw.specialties, target.level)
     }
+    if (raw.specialtyOptions && Array.isArray(raw.specialtyOptions)) {
+      target.specialtyOptions = raw.specialtyOptions
+    }
     if (raw.note) target.note = raw.note
     if (raw.allowSpecialties !== undefined) target.allowSpecialties = raw.allowSpecialties
     if (raw.specialtyPlaceholder) target.specialtyPlaceholder = raw.specialtyPlaceholder
@@ -806,13 +799,16 @@ const normalizeSkills = (rawSkills) => {
     if (skill.allowSpecialties && !Array.isArray(skill.specialties)) {
       skill.specialties = []
     }
+    if (skill.allowSpecialties && !Array.isArray(skill.specialtyOptions)) {
+      skill.specialtyOptions = []
+    }
   })
 
   return defaults
 }
 
 const groupedSkills = computed(() => {
-  const groups = { might: [], speed: [], intellect: [] }
+  const groups = { combat: [], social: [], investigation: [], technical: [], survival: [], knowledge: [] }
   character.value.skills.forEach(skill => {
     if (!skill || !skill.name) return
     if (groups[skill.category]) {
@@ -826,18 +822,15 @@ const getVisibleSpecialties = (skill) => {
   const specialties = Array.isArray(skill?.specialties)
     ? skill.specialties.filter(spec => spec && spec.name)
     : []
-  if (!hideOutsiderSkills.value) return specialties
-  return specialties.filter(spec => spec.level !== 'outsider')
+  return specialties
 }
 
 const isSkillVisible = (skill) => {
-  if (!hideOutsiderSkills.value) return true
-  if (skill.level !== 'outsider') return true
-  return getVisibleSpecialties(skill).length > 0
+  return true
 }
 
 const visibleGroupedSkills = computed(() => {
-  const groups = { might: [], speed: [], intellect: [] }
+  const groups = { combat: [], social: [], investigation: [], technical: [], survival: [], knowledge: [] }
   Object.keys(groupedSkills.value).forEach((key) => {
     groups[key] = groupedSkills.value[key].filter(skill => isSkillVisible(skill))
   })
@@ -850,8 +843,13 @@ const getSkillLevelLabel = (level) => {
 }
 
 const getSkillDisplayLevel = (skill) => {
-  if (hideOutsiderSkills.value && skill.level === 'outsider') return ''
   return getSkillLevelLabel(skill.level)
+}
+
+const getSkillTooltip = (skill) => {
+  const specs = getVisibleSpecialties(skill)
+  if (!specs.length) return ''
+  return specs.map(spec => `${spec.name} ${getSkillLevelLabel(spec.level)}`).join('\n')
 }
 
 const getSkillLevelBadgeClass = (level) => {
@@ -878,6 +876,31 @@ const addSpecialty = (skill) => {
   if (!Array.isArray(skill.specialties)) skill.specialties = []
   const defaultLevel = skill.level || 'outsider'
   skill.specialties.push({ name: '', level: defaultLevel })
+}
+
+const hasSpecialtyName = (skill, name) => {
+  if (!Array.isArray(skill.specialties)) return false
+  return skill.specialties.some(spec => spec && spec.name === name)
+}
+
+const getAvailableSpecialtyOptions = (skill) => {
+  const options = Array.isArray(skill.specialtyOptions) ? skill.specialtyOptions : []
+  const hasEmpty = Array.isArray(skill.specialties)
+    ? skill.specialties.some(spec => spec && !spec.name)
+    : false
+  return options.filter(option => !hasSpecialtyName(skill, option))
+    .filter(option => !(option === '外語（自填）' && hasEmpty))
+}
+
+const addSpecialtyFromOption = (skill, option) => {
+  if (!skill.allowSpecialties) return
+  if (!option) return
+  const levelOverride = option === '母語' ? 'amateur' : (skill.level || 'outsider')
+  const name = option === '外語（自填）' ? '' : option
+  if (name && hasSpecialtyName(skill, name)) return
+  if (!Array.isArray(skill.specialties)) skill.specialties = []
+  if (!name && skill.specialties.some(spec => spec && !spec.name)) return
+  skill.specialties.push({ name, level: levelOverride })
 }
 
 const removeSpecialty = (skill, index) => {
