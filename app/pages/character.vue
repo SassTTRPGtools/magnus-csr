@@ -151,10 +151,10 @@
             </div>
           </div>
 
-          <!-- 傷害軌、壓力與理智軌三欄整合區塊 -->
+          <!-- 傷害軌與壓力兩欄整合區塊 -->
           <div class="character-section mb-6">
             <div class="border-2 border-black bg-white p-3">
-              <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 
                 <!-- 傷害軌（左欄） -->
                 <div class="border-r border-gray-300 pr-3">
@@ -259,46 +259,6 @@
                   </div>
                 </div>
 
-                <!-- 理智軌（右欄） -->
-                <div>
-                  <div class="text-xs font-bold uppercase tracking-wide mb-3 sanity-title" title="崩潰發作時擲骰 1D20，心理崩潰骰到 19-20 或完全崩潰骰到 20 將發生勇氣爆發。勇氣爆發：你忽略崩潰結果與壓力量級導致的任務受阻，但仍舊會承受重傷，到緊迫的危機解除。">理智軌</div>
-                  <div class="space-y-1 text-xs">
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="calm" class="mr-1 scale-75">
-                      <span class="font-bold" title="正常狀態">平靜</span>
-                    </label>
-                    
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="uneasy" class="mr-1 scale-75">
-                      <span class="font-bold text-yellow-600" title="表現在扮演上">不安</span>
-                    </label>
-                    
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="shaken" class="mr-1 scale-75">
-                      <span class="font-bold text-orange-600" title="表現在扮演上">動搖</span>
-                    </label>
-                    
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="neurotic" class="mr-1 scale-75">
-                      <span class="font-bold text-red-600" title="心理崩潰發作，擲骰隨機表">神經質</span>
-                    </label>
-                    
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="irrational" class="mr-1 scale-75">
-                      <span class="font-bold text-red-700" title="表現在扮演上">不理性</span>
-                    </label>
-                    
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="insane" class="mr-1 scale-75">
-                      <span class="font-bold text-red-800" title="心理崩潰發作，擲骰隨機表">精神錯亂</span>
-                    </label>
-                    
-                    <label class="flex items-center track-item p-1">
-                      <input type="radio" v-model="character.sanityTrack" value="breakdown" class="mr-1 scale-75">
-                      <span class="font-bold text-black" title="完全崩潰發作，你陷入不可控制的狀態，當狀態結束時回到神經質階段，且永久留下一個症狀">完全崩潰</span>
-                    </label>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -625,7 +585,6 @@ const character = ref({
     tenHours: false
   },
   damageTrack: 'hale',
-  sanityTrack: 'calm',
   currentStress: 0,
   stressLevel: 0,
   supernaturalStressMarks: Array(10).fill(false),
@@ -932,7 +891,6 @@ const clearForm = () => {
         tenHours: false
       },
       damageTrack: 'hale',
-      sanityTrack: 'calm',
       currentStress: 0,
       stressLevel: 0,
       supernaturalStressMarks: Array(10).fill(false),
@@ -965,6 +923,9 @@ const loadFromLocalStorage = () => {
     const savedData = localStorage.getItem('magnus-csr-character')
     if (savedData) {
       const parsedData = JSON.parse(savedData)
+      if (parsedData && Object.prototype.hasOwnProperty.call(parsedData, 'sanityTrack')) {
+        delete parsedData.sanityTrack
+      }
       
       // 先處理技能資料，確保格式正確
       let processedSkills = Array(15).fill(null).map(() => ({ text: '', level: 'normal', editing: false }))
@@ -1002,7 +963,6 @@ const loadFromLocalStorage = () => {
           tenHours: false
         },
         damageTrack: 'hale',
-        sanityTrack: 'calm',
         currentStress: 0,
         stressLevel: 0,
         supernaturalStressMarks: Array(10).fill(false),
@@ -1061,6 +1021,9 @@ const importFromJSON = (event) => {
   reader.onload = (e) => {
     try {
       const importedData = JSON.parse(e.target.result)
+      if (importedData && Object.prototype.hasOwnProperty.call(importedData, 'sanityTrack')) {
+        delete importedData.sanityTrack
+      }
       if (confirm('確定要匯入這個角色資料嗎？這將覆蓋目前的資料。')) {
         // 先處理技能資料，確保格式正確
         let processedSkills = Array(15).fill(null).map(() => ({ text: '', level: 'normal', editing: false }))
@@ -1131,7 +1094,6 @@ const exportToText = async () => {
 
 【狀態軌】
 傷害軌：${getTrackDisplayName(character.value.damageTrack, 'damage')}
-理智軌：${getTrackDisplayName(character.value.sanityTrack, 'sanity')}
 壓力：${character.value.currentStress}　壓力量級：${character.value.stressLevel}
 超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10
 
@@ -1211,7 +1173,6 @@ const copyStatusToClipboard = async () => {
 
 【狀態軌】
 傷害軌：${getTrackDisplayName(character.value.damageTrack, 'damage')}
-理智軌：${getTrackDisplayName(character.value.sanityTrack, 'sanity')}
 壓力：${character.value.currentStress}　壓力量級：${character.value.stressLevel}
 超自然壓力：${character.value.supernaturalStressMarks.filter(Boolean).length}/10`
 
@@ -1245,15 +1206,6 @@ const getTrackDisplayName = (value, type) => {
       'debilitated': '重創',
       'dead': '死亡'
     },
-    sanity: {
-      'calm': '平靜',
-      'uneasy': '不安',
-      'shaken': '動搖',
-      'neurotic': '神經質',
-      'irrational': '不理性',
-      'insane': '精神錯亂',
-      'breakdown': '完全崩潰'
-    }
   }
   return tracks[type][value] || value
 }
@@ -1506,14 +1458,7 @@ select option {
   }
 }
 
-/* 理智軌標題特殊效果 */
-.sanity-title:hover {
-  color: #a13c3c;
-  text-shadow: 0 0 8px rgba(161, 60, 60, 0.6);
-  transition: all 0.3s ease;
-}
-
-/* 傷害軌和理智軌項目懸浮效果 */
+/* 傷害軌項目懸浮效果 */
 .track-item:hover {
   background-color: rgba(161, 60, 60, 0.1);
   border-radius: 2px;
