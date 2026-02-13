@@ -363,7 +363,7 @@
                               <div class="font-medium">{{ skill && skill.name }}</div>
                               <div v-if="skill && skill.note" class="text-gray-600">{{ skill.note }}</div>
                             </div>
-                            <span v-if="skill && getSkillDisplayLevel(skill)" :class="getSkillLevelBadgeClass(skill.level)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
+                            <span v-if="skill && getSkillDisplayLevel(skill)" :class="getSkillBadgeClass(skill)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
                               {{ getSkillDisplayLevel(skill) }}
                             </span>
                           </div>
@@ -562,11 +562,30 @@
               <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="border-b border-gray-200 pb-3">
                 <div class="text-xs font-medium mb-1">{{ skill && skill.name }}</div>
                 <div v-if="skill && skill.note" class="text-[11px] text-gray-600 mb-2">{{ skill.note }}</div>
-                <select v-if="skill" v-model="skill.level" class="w-full text-xs border border-gray-300 rounded px-2 py-1 font-typewriter focus:outline-none focus:border-black bg-gray-50 mb-2">
-                  <option v-for="level in skillLevelOptions" :key="level.value" :value="level.value">
-                    {{ level.label }} ({{ level.mod }})
+                <select
+                  v-if="skill"
+                  v-model="skill.level"
+                  :disabled="skill.allowSpecialties"
+                  :title="skill.allowSpecialties ? '此技能有專精項目，主技能定位已鎖定不可修改' : ''"
+                  :class="[
+                    'w-full text-xs border rounded px-2 py-1 font-typewriter focus:outline-none mb-2',
+                    skill.allowSpecialties
+                      ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
+                      : 'border-gray-300 focus:border-black bg-gray-50'
+                  ]">
+                  <option v-for="level in getLevelOptionsForSkill(skill)" :key="level.value" :value="level.value">
+                    {{ level.mod ? `${level.label} (${level.mod})` : level.label }}
                   </option>
                 </select>
+                <div v-if="skill && isCreditRatingSkill(skill)" class="mb-2 space-y-1">
+                  <div class="text-[11px] text-gray-600">自訂顯示</div>
+                  <input
+                    v-model.trim="skill.creditDisplay"
+                    type="text"
+                    placeholder="例如：42% 或 中產階級"
+                    class="w-full text-xs border border-gray-300 rounded px-2 py-1 font-typewriter focus:outline-none focus:border-black bg-white">
+                </div>
+                <div v-if="skill && skill.allowSpecialties" class="text-[11px] text-gray-500 -mt-1 mb-2">主技能定位已鎖定，請調整下方專精項目。</div>
                 <div v-if="skill && skill.allowSpecialties" class="space-y-2">
                   <div class="text-[11px] text-gray-600">專精</div>
                   <div class="flex flex-wrap items-center gap-2">
@@ -800,6 +819,15 @@ const skillLevelOptions = [
   { value: 'master', label: '大師🎖️', mod: '+2' }
 ]
 
+const creditRatingLevelOptions = [
+  { value: 'outsider', label: '01–05%', mod: '' },
+  { value: 'novice', label: '06–19%', mod: '' },
+  { value: 'amateur', label: '20–49%', mod: '' },
+  { value: 'pro', label: '50–74%', mod: '' },
+  { value: 'expert', label: '75–89%', mod: '' },
+  { value: 'master', label: '90%+', mod: '' }
+]
+
 const skillCategories = [
   { id: 'combat', label: '戰鬥', icon: '⚔️' },
   { id: 'social', label: '社交', icon: '💬' },
@@ -819,12 +847,12 @@ function buildDefaultSkills () {
   { id: 'first-aid', name: '急救', category: 'combat', level: 'amateur' },
 
   // 社交 (Social)
-  { id: 'charm', name: '魅力', category: 'social', level: 'outsider' },
+  { id: 'charm', name: '取悅', category: 'social', level: 'outsider' },
   { id: 'fast-talk', name: '話術', category: 'social', level: 'outsider' },
   { id: 'intimidate', name: '威脅', category: 'social', level: 'outsider' },
   { id: 'persuade', name: '說服', category: 'social', level: 'outsider' },  
-  { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造', '攝影'] },
-  { id: 'credit', name: '信用評級', category: 'social', level: 'outsider' },
+  { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造文書', '攝影'] },
+  { id: 'credit', name: '信用評級', category: 'social', level: 'outsider', creditDisplay: '' },
 
   // 調查 (Investigation)
   { id: 'library', name: '圖書館使用', category: 'investigation', level: 'amateur' },
@@ -837,19 +865,20 @@ function buildDefaultSkills () {
   { id: 'psychoanalysis', name: '精神分析', category: 'investigation', level: 'outsider' },
 
   // 技術 (Technical)
-  { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider' },
-  { id: 'car', name: '開車', category: 'technical', level: 'amateur' },
+  { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['民用螺旋飛機', '熱氣球', '小艇', '輪船', '船舶'], specialtyPlaceholder: '駕駛類型' },
+  { id: 'car', name: '汽車駕駛', category: 'technical', level: 'novice' },
+  { id: 'ride', name: '騎術', category: 'technical', level: 'outsider' },
   { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'outsider' },
   { id: 'mechanical-repair', name: '機械維修', category: 'technical', level: 'outsider' },
-  { id: 'stealth', name: '隱匿', category: 'technical', level: 'amateur' },
-  { id: 'disguise', name: '偽裝', category: 'technical', level: 'outsider' },
+  { id: 'stealth', name: '潛匿', category: 'technical', level: 'amateur' },
+  { id: 'disguise', name: '喬裝', category: 'technical', level: 'outsider' },
   { id: 'sleight-of-hand', name: '巧手', category: 'technical', level: 'outsider' },
   { id: 'locksmith', name: '鎖匠', category: 'technical', level: 'outsider' },
   { id: 'heavy-machinery', name: '操作重機', category: 'technical', level: 'outsider' },
 
   // 生存 (Survival)
-  { id: 'survival', name: '生存', category: 'survival', level: 'outsider' },
-  { id: 'climb', name: '攀爬', category: 'survival', level: 'amateur' },
+  { id: 'survival', name: '生存', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['高原', '沙漠', '叢林', '高山', '極地'], specialtyPlaceholder: '生存環境' },
+  { id: 'climb', name: '攀爬', category: 'survival', level: 'novice' },
   { id: 'jump', name: '跳躍', category: 'survival', level: 'amateur' },
   { id: 'swim', name: '游泳', category: 'survival', level: 'amateur' },
   { id: 'nature', name: '自然世界', category: 'survival', level: 'outsider' },
@@ -861,7 +890,7 @@ function buildDefaultSkills () {
   { id: 'anthropology', name: '人類學', category: 'knowledge', level: 'outsider' },
   { id: 'law', name: '法律', category: 'knowledge', level: 'outsider' },
   { id: 'medicine', name: '醫藥', category: 'knowledge', level: 'outsider' },
-  { id: 'science', name: '科學', category: 'knowledge', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['天文學', '生物學', '植物學', '化學', '經濟學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'] },
+  { id: 'science', name: '科學', category: 'knowledge', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['天文學', '生物學', '植物學', '化學', '密碼學', '工程學', '司法科學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'] },
   { id: 'occult', name: '神祕學', category: 'knowledge', level: 'outsider' },  
   { id: 'accounting', name: '會計', category: 'knowledge', level: 'outsider' },  
   
@@ -915,6 +944,9 @@ const normalizeSkills = (rawSkills) => {
     if (!target) return
 
     if (raw.level) target.level = raw.level
+    if (raw.creditDisplay !== undefined) {
+      target.creditDisplay = String(raw.creditDisplay || '').trim()
+    }
     if (raw.specialties !== undefined) {
       target.specialties = normalizeSpecialties(raw.specialties, target.level)
     }
@@ -968,13 +1000,32 @@ const visibleGroupedSkills = computed(() => {
   return groups
 })
 
+const isCreditRatingSkill = (skill) => {
+  return skill?.id === 'credit' || skill?.name === '信用評級'
+}
+
+const getLevelOptionsForSkill = (skill) => {
+  return isCreditRatingSkill(skill) ? creditRatingLevelOptions : skillLevelOptions
+}
+
 const getSkillLevelLabel = (level) => {
   const found = skillLevelOptions.find(option => option.value === level)
   return found ? `${found.label} ${found.mod}` : level
 }
 
+const getSkillLevelLabelForSkill = (skill, level) => {
+  if (isCreditRatingSkill(skill)) {
+    const custom = String(skill?.creditDisplay || '').trim()
+    if (custom) return custom
+  }
+  const options = getLevelOptionsForSkill(skill)
+  const found = options.find(option => option.value === level)
+  if (!found) return level
+  return found.mod ? `${found.label} ${found.mod}` : found.label
+}
+
 const getSkillDisplayLevel = (skill) => {
-  return getSkillLevelLabel(skill.level)
+  return getSkillLevelLabelForSkill(skill, skill.level)
 }
 
 const getSkillTooltip = (skill) => {
@@ -1000,6 +1051,13 @@ const getSkillLevelBadgeClass = (level) => {
     default:
       return 'text-gray-600 border-gray-300 bg-gray-50'
   }
+}
+
+const getSkillBadgeClass = (skill) => {
+  if (isCreditRatingSkill(skill)) {
+    return 'text-indigo-700 border-indigo-300 bg-indigo-50'
+  }
+  return getSkillLevelBadgeClass(skill.level)
 }
 
 const addSpecialty = (skill) => {
@@ -1558,7 +1616,7 @@ ${nonEmptyAttacks.length > 0 ?
 
 【技能】
 ${character.value.skills.map((skill, index) => {
-  const levelText = getSkillLevelLabel(skill.level)
+  const levelText = getSkillDisplayLevel(skill)
   const noteText = skill.note ? `（${skill.note}）` : ''
   const lines = [`${index + 1}. ${skill.name} ${levelText}${noteText}`]
   if (Array.isArray(skill.specialties) && skill.specialties.length > 0) {
