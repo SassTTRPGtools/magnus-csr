@@ -360,7 +360,13 @@
                         <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="text-sm border-b border-gray-200 pb-2">
                           <div class="flex items-start justify-between">
                             <div class="pr-2">
-                              <div class="font-medium">{{ skill && skill.name }}</div>
+                              <div class="font-medium inline-flex items-center gap-1">
+                                <span>{{ skill && skill.name }}</span>
+                                <span
+                                  v-if="skill && skill.tooltip"
+                                  :data-tooltip="skill.tooltip"
+                                  class="relative inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full border border-gray-400 text-gray-600 bg-white cursor-help">i</span>
+                              </div>
                               <div v-if="skill && skill.note" class="text-gray-600">{{ skill.note }}</div>
                             </div>
                             <span v-if="skill && getSkillDisplayLevel(skill)" :class="getSkillBadgeClass(skill)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
@@ -369,7 +375,13 @@
                           </div>
                           <div v-if="skill && getVisibleSpecialties(skill).length" class="mt-2 space-y-1">
                             <div v-for="(spec, specIndex) in getVisibleSpecialties(skill)" :key="specIndex" class="flex items-start justify-between text-xs">
-                              <div class="text-gray-700">- {{ spec && spec.name }}</div>
+                              <div class="text-gray-700 inline-flex items-center gap-1">
+                                <span>- {{ spec && spec.name }}</span>
+                                <span
+                                  v-if="spec && getSpecialtyTooltip(skill, spec.name)"
+                                  :data-tooltip="getSpecialtyTooltip(skill, spec.name)"
+                                  class="relative inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full border border-gray-400 text-gray-600 bg-white cursor-help">i</span>
+                              </div>
                               <span v-if="spec" :class="getSkillLevelBadgeClass(spec.level)" class="px-2 py-0.5 rounded border text-xs whitespace-nowrap">
                                 {{ getSkillLevelLabel(spec.level) }}
                               </span>
@@ -560,7 +572,13 @@
             <div class="text-xs font-bold mb-2">{{ category.icon }} {{ category.label }}</div>
             <div class="space-y-2">
               <div v-for="skill in (visibleGroupedSkills[category.id] || [])" :key="skill.id" class="border-b border-gray-200 pb-3">
-                <div class="text-xs font-medium mb-1">{{ skill && skill.name }}</div>
+                <div class="text-xs font-medium mb-1 inline-flex items-center gap-1">
+                  <span>{{ skill && skill.name }}</span>
+                  <span
+                    v-if="skill && skill.tooltip"
+                    :data-tooltip="skill.tooltip"
+                    class="relative inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full border border-gray-400 text-gray-600 bg-white cursor-help">i</span>
+                </div>
                 <div v-if="skill && skill.note" class="text-[11px] text-gray-600 mb-2">{{ skill.note }}</div>
                 <select
                   v-if="skill"
@@ -604,6 +622,10 @@
                       v-model="spec.name"
                       :placeholder="skill.specialtyPlaceholder || '專精名稱'"
                       class="flex-1 min-w-[140px] text-xs bg-transparent border border-gray-300 rounded px-2 py-1 focus:outline-none focus:border-black font-typewriter">
+                    <span
+                      v-if="spec && getSpecialtyTooltip(skill, spec.name)"
+                      :data-tooltip="getSpecialtyTooltip(skill, spec.name)"
+                      class="relative inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full border border-gray-400 text-gray-600 bg-white cursor-help">i</span>
                     <select v-model="spec.level" class="text-xs border border-gray-300 rounded px-2 py-1 font-typewriter focus:outline-none focus:border-black bg-gray-50">
                       <option v-for="level in skillLevelOptions" :key="level.value" :value="level.value">
                         {{ level.label }} ({{ level.mod }})
@@ -840,59 +862,98 @@ const skillCategories = [
 function buildDefaultSkills () {
   return [
   // 戰鬥 (Combat)
-  { id: 'combat', name: '戰鬥', category: 'combat', level: 'amateur', allowSpecialties: true, specialties: [], specialtyOptions: ['斧頭', '鬥毆', '鏈鋸', '連枷', '絞索', '斧', '劍', '鞭子'] },
-  { id: 'firearms', name: '火器', category: 'combat', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['弓', '手槍', '重武器', '火焰發射器', '機關槍', '步槍／霰彈槍', '衝鋒槍'] },
+  { id: 'combat', name: '戰鬥', category: 'combat', level: 'amateur', allowSpecialties: true, specialties: [], specialtyOptions: ['斧', '鬥毆', '鏈鋸', '連枷', '絞索', '矛', '刀劍', '鞭'], specialtyTooltips: {
+    '斧': '用於較大的伐木斧。手斧則可以使用鬥毆技能。如果投擲斧子，使用投擲技能。',
+    '斧頭': '用於較大的伐木斧。手斧則可以使用鬥毆技能。如果投擲斧子，使用投擲技能。',
+    '鬥毆': '包括所有形式的徒手格鬥，以及任何人都能輕易使用的基本武器，如棍棒（乃至板球棒或棒球棍）、刀具、以及各種臨時武器，如酒瓶和椅子腿。為了決定這些臨時武器所能造成的傷害，守秘人應該參考武器列表中與之類似的武器。',
+    '鏈鋸': '世界上第一款以汽油為動力且大批量生產的鏈鋸出現於1927年。不過，也有早期版本的鏈鋸存在。',
+    '連枷': '用於雙截棍、釘頭槌及與之類似的中世紀武器。',
+    '絞索': '以長度足夠的任意材料進行絞喉。受害者需要使用戰技來逃脫，否則每輪將受到1D6 點傷害。',
+    '矛': '用於長矛和刺槍。如果投矛，使用投擲技能。',
+    '刀劍': '用於所有長度超過半米的利刃。',
+    '劍': '用於所有長度超過半米的利刃。',
+    '鞭': '用於流星索和長鞭。',
+    '鞭子': '用於流星索和長鞭。'
+  } },
+  { id: 'firearms', name: '火器', category: 'combat', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['弓', '手槍', '重武器', '火焰噴射器', '機關槍', '步槍/霰彈槍', '衝鋒槍'], specialtyTooltips: {
+    '弓': '用於弓和弩，包括中世紀長弓到現代高性能複合弓。',
+    '手槍': '用於所有手槍類武器，進行非連續性射擊。現代全自動手槍（MAC-11、UZI 微型衝鋒槍等）則使用衝鋒槍技能進行射擊。',
+    '重武器': '用於榴彈發射器、反坦克火箭等。',
+    '火焰噴射器': '噴射易燃液體或氣體的武器。可由操作者攜帶或安裝於載具上。',
+    '機關槍': '架設在兩腳架或三腳架上，能夠進行全自動射擊的武器。如果以架設於兩腳架的此類武器進行單發射擊，則使用步槍技能。如今，突擊步槍、衝鋒槍和輕機槍之間差異已經不甚明顯。',
+    '步槍/霰彈槍': '用於所有類型的步槍（無論是槓桿式、栓式還是半自動步槍）及霰彈槍。由於霰彈槍的彈藥以散射方式擊發，使用者的命中目標的概率不會隨著射程增加而降低，但造成的傷害會因此減少。此外，以突擊步槍進行單發射擊（或多次單發射擊）時，使用該技能。',
+    '衝鋒槍': '用於所有全自動手槍和衝鋒槍，也可用於全自動模式的突擊步槍。'
+  } },
   { id: 'dodge', name: '閃避', category: 'combat', level: 'outsider' },
   { id: 'throwing', name: '投擲', category: 'combat', level: 'amateur' },
-  { id: 'first-aid', name: '急救', category: 'combat', level: 'amateur' },
+  { id: 'first-aid', name: '急救', category: 'combat', level: 'amateur', tooltip: '技能使用者能夠提供緊急醫療處理。這可能包括：用夾板固定斷肢、止血、處理燒傷、救助溺水者、清理及包紮傷口等。急救無法用於治療疾病（這需要使用醫學技能）。\n要使急救發揮作用，必須在受傷的一小時內使用這項技能，急救者可以花費自己的恢復骰來恢復傷者。兩名角色可以共同進行急救，只要其中任意一人的檢定成功即可。' },
 
   // 社交 (Social)
-  { id: 'charm', name: '取悅', category: 'social', level: 'outsider' },
-  { id: 'fast-talk', name: '話術', category: 'social', level: 'outsider' },
-  { id: 'intimidate', name: '威脅', category: 'social', level: 'outsider' },
-  { id: 'persuade', name: '說服', category: 'social', level: 'outsider' },  
-  { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造文書', '攝影'] },
+  { id: 'charm', name: '取悅', category: 'social', level: 'outsider', tooltip: '取悅包含多種形式，包括以外貌吸引、誘惑、奉承或僅僅是依靠個人魅力。取悅技能可用於迫使對方以某種方式行動，但不可能使其做出完全與平日作風相反的行為。此技能與心理學技能對立。' },
+  { id: 'fast-talk', name: '話術', category: 'social', level: 'outsider', tooltip: '話術的範圍限於語言詭計、欺詐和誤導，例如哄騙保安使其允許你進入俱樂部、讓某人在一份他還未讀過的表單上簽字、讓警察去查看相反的方向等等。\n此技能與心理學對立。經過短暫的時間之後（通常是在話術使用者離開場景後），目標就會意識到他們受騙了。話術的效果總是十分短暫，但如果取得了更高的成功等級，這個效果便可以持續更長的時間。' },
+  { id: 'intimidate', name: '威脅', category: 'social', level: 'outsider', tooltip: '威脅有多種形式，包括武力震懾、心理操控和威脅。可用於驚嚇或強迫對方以某種方式行動。這項技能與心理學技能對立。使用武器或其他有利道具協助進行恐嚇可以使難度等級降低。' },
+  { id: 'persuade', name: '說服', category: 'social', level: 'outsider', tooltip: '通過合理的論證、論辯與討論使對方相信某一特定想法、概念或信念。說服的內容可能並非事實。成功的說服需要花費至少半個小時的時間。如果你想要迅速地勸服對方，則應當使用話術技能。此技能心理學技能對立。\n根據玩家所表達的內容，如果調查員在說服目標上花費了足夠多的時間，說服的效果可能會無限期的延續下去：可能會持續數年時間，直到發生事件或另一次說服轉變目標的想法。' },  
+  { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造文書', '攝影'], specialtyTooltips: {
+    '表演': '表演者接受過戲劇和/或電影表演訓練（在現代，可能也會包括電視表演），能夠使其化身為一個角色，背誦劇本，還能依靠化妝來改變自己的樣貌。見喬裝。',
+    '美術': '畫家擅長繪畫藝術（油畫、丙烯畫、水彩畫），以及用鉛筆、蠟筆或粉筆進行素描。嚴肅的作品可能需要數天乃至數月才能被創作出來，但畫家可以迅速將印象中的場景、物品和人物勾畫出來。這項技能還表示對藝術界的熟悉程度，讓畫家可以認出特定藝術家的作品、他們的學校以及這件作品的過去。',
+    '偽造文書': '偽造者擅長重現細節，能夠製作高品質的假文件，模仿他人的字跡，偽造政府部門簽發的文件或許可，以及複製一本巨著。偽造者會需要合適的材料（特殊的墨水、高品質的紙張等）以及要複製的原件。成功的檢定意味著偽造出來的文件能夠通過正常的粗略檢查。花時間徹底查驗文件的人將使用其鑑定技能（與偽造者的偽造文書技能對立）來確定其能否發現文件是偽造的。',
+    '攝影': '包括靜態及運動攝影，這項技能可用於拍攝清晰的照片、沖洗底片並增強暗部細節。在1920s，技能使用者能夠製備用於製作閃光粉所需的化學品。'
+  } },
   { id: 'credit', name: '信用評級', category: 'social', level: 'outsider', creditDisplay: '' },
 
   // 調查 (Investigation)
-  { id: 'library', name: '圖書館使用', category: 'investigation', level: 'amateur' },
-  { id: 'listen', name: '聆聽', category: 'investigation', level: 'amateur' },
-  { id: 'observe', name: '偵查', category: 'investigation', level: 'amateur' },
-  { id: 'navigate', name: '導航', category: 'investigation', level: 'outsider' },
-  { id: 'track', name: '追蹤', category: 'investigation', level: 'outsider' },
-  { id: 'appraise', name: '鑑定', category: 'investigation', level: 'outsider' },
-  { id: 'psychology', name: '心理學', category: 'investigation', level: 'outsider' },
-  { id: 'psychoanalysis', name: '精神分析', category: 'investigation', level: 'outsider' },
+  { id: 'library', name: '圖書館使用', category: 'investigation', level: 'amateur', tooltip: '圖書館使用可以使調查員找到一段資訊，例如一份特定的書籍、報紙、圖書館中的參考文獻或是整理過的文件或資料庫，但前提是這條資訊確實可以被找到。此技能意味著需要進行數個小時的持續檢索。\n這項技能可以用於找到某本被封鎖的檔案或罕見的珍藏書籍，但要取得它們，可能需要用到說服、話術、取悅、恐嚇、信用評級或是特殊的資質文件。' },
+  { id: 'listen', name: '聆聽', category: 'investigation', level: 'amateur', tooltip: '衡量調查員詮釋和理解聲音的能力，包括無意中聽見的對話、門後的輕聲交談與咖啡廳裡的低聲私語。' },
+  { id: 'observe', name: '偵查', category: 'investigation', level: 'amateur', tooltip: '技能使用者能夠發現密門或隔間，注意到藏匿起來的闖入者，發現不明顯的線索，辨認重新噴漆的汽車，意識到伏擊者，注意到鼓起的口袋，以及各種類似的事物。這項技能對於調查員來說十分重要。如果角色只有極短的時機發現某些事物，如飛身而過的時候，守秘人可能會選擇提高難度。如果角色進行徹底的搜索，守秘人可以選擇使其檢定自動成功。所處的環境也可能影響檢定的難度——在雜亂的房間裡很難找到東西。' },
+  { id: 'navigate', name: '導航', category: 'investigation', level: 'outsider', tooltip: '無論是白天還是夜晚，暴風雨還是晴天，這項技能都能用於找到正確的方向。若遊戲的時代合適，擁有較高導航技能的角色將會熟悉星曆表、海圖、導航儀器和衛星定位設備。這項技能同樣可以用於測量並繪製一個區域（製圖學），無論這個區域是數平方公里的島嶼還是某個房間的內部。' },
+  { id: 'track', name: '追蹤', category: 'investigation', level: 'outsider', tooltip: '使用此技能，調查員能夠通過地面或植物上的痕跡來追蹤人、載具或動物。諸如痕跡遺留的時間、降雨和地面的類型等因素都可能會影響檢定的難度等級。' },
+  { id: 'appraise', name: '鑑定', category: 'investigation', level: 'outsider', tooltip: '用於鑑定某一特定物品的價值、品質，及其使用的材料和工藝。如有需要，技能使用者能夠確認物品的時代，評估其歷史價值，並判斷其真贗。' },
+  { id: 'psychology', name: '心理學', category: 'investigation', level: 'outsider', tooltip: '所有人都擁有的察言觀色的能力，技能使用者能夠觀察另一個人，從中判斷其動機和性格。守秘人可以選擇代替玩家暗中進行心理學技能檢定，只告知玩家使用該技能所獲取的資訊，而不告知這一資訊的真偽。' },
+  { id: 'psychoanalysis', name: '精神分析', category: 'investigation', level: 'outsider', tooltip: '這項技能代表一系列心理療法，密集的精神分析可以使接受治療的調查員回復理智值。遊戲中每月一次，擲1D100，與精神分析師或醫生的精神分析技能相對比，以此確認治療進展。若檢定成功，患者回復1D3點理智值。若檢定失敗則不回復點數。若檢定大失敗，患者將失去1D6 點理智，且這位精神分析師的治療就此終結：治療過程中發生了嚴重的事故或戲劇性的挫折，導致醫師和患者間的關係破裂，無法挽救。\n在遊戲中，精神分析本身不能幫助角色從不定性瘋狂中恢復，這需要1D6個月的收容機構（或類似設施）護理，精神分析可能是其中的一部分。\n成功的使用這項技能可以讓角色暫時克服恐懼症的症狀，或是讓他們看穿幻覺。在遊戲中，這將允許一位陷入瘋狂的調查員在短時間內忽略恐懼症或躁狂症的影響，例如讓一位幽閉恐懼症患者在狹小的櫥櫃中躲藏十分鐘。同樣，角色可以進行精神分析檢定來幫助另一名陷入幻覺的調查員暫時看穿其幻覺。' },
 
   // 技術 (Technical)
-  { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['民用螺旋飛機', '熱氣球', '小艇', '輪船', '船舶'], specialtyPlaceholder: '駕駛類型' },
-  { id: 'car', name: '汽車駕駛', category: 'technical', level: 'novice' },
-  { id: 'ride', name: '騎術', category: 'technical', level: 'outsider' },
-  { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'outsider' },
-  { id: 'mechanical-repair', name: '機械維修', category: 'technical', level: 'outsider' },
-  { id: 'stealth', name: '潛匿', category: 'technical', level: 'amateur' },
-  { id: 'disguise', name: '喬裝', category: 'technical', level: 'outsider' },
-  { id: 'sleight-of-hand', name: '巧手', category: 'technical', level: 'outsider' },
-  { id: 'locksmith', name: '鎖匠', category: 'technical', level: 'outsider' },
-  { id: 'heavy-machinery', name: '操作重機', category: 'technical', level: 'outsider' },
+  { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['民用螺旋飛機', '熱氣球', '小艇', '輪船', '船舶'], specialtyPlaceholder: '駕駛類型', tooltip: '這項技能相當於水上或空中的汽車駕駛，用於操縱飛行或水上載具。任何一位在此技能上擁有適當能力的角色都可以在風平浪靜、能見度良好的情況下航行或飛行，但在暴風雨來臨、利用儀器導航、能見度低下或遭遇其他困境時，則需要進行檢定。惡劣天氣、低能見度和破損的載具都可能導致操縱飛行或水上載具的難度提高。' },
+  { id: 'car', name: '汽車駕駛', category: 'technical', level: 'novice', tooltip: '任何具備此技能的人都能夠駕駛轎車或輕型卡車進行常規機動，並處理常見的載具問題。如果調查員想要甩掉追蹤者或追蹤某個人，那麼他可能需要進行一個汽車駕駛檢定。不同的文明可能會用相似的技能替代汽車駕駛：因紐特人可能會使用「雪橇駕駛」，維多利亞人則可能會使用「馬車駕駛」。' },
+  { id: 'ride', name: '騎術', category: 'technical', level: 'outsider', tooltip: '此技能用於騎乘馴馬、驢或騾子，並包含有關坐騎的基本護理、騎乘用具以及馭使坐騎疾馳或越過困難地形的知識。' },
+  { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'outsider', tooltip: '使調查員能夠修理或重設電氣設備，如自動點火器、電動機、保險絲盒與防盜警報等。在現代，這項技能不會被用於電子產品。\n維修電氣設備可能需要特殊的零件或工具。在1920s，這類工作可能需要把電氣維修和機械維修結合使用。電氣維修也可以用於現代爆炸物（如雷管、C4 塑膠炸藥以及地雷）。這類武器的設計易於布置，只有大失敗才會' },
+  { id: 'mechanical-repair', name: '機械維修', category: 'technical', level: 'outsider', tooltip: '使調查員能夠修復一臺損壞的，或製作一臺新的機械裝置。同樣也可用於進行基礎的木工與管道工工作，以及構建（如滑輪系統）與修復（如蒸汽泵）物品。\n進行這些工作時可能需要特殊的工具或零件。此外，這項技能還可用於打開普通的家庭用鎖，但更為複雜的鎖需要鎖匠技能才能打開。機械維修常與電氣維修同時使用，維修汽車或飛機這類複雜設備時可能同時用到這兩項技能。' },
+  { id: 'stealth', name: '潛匿', category: 'technical', level: 'amateur', tooltip: '在不被人聽到或看到的情況下，安靜地進行移動與躲藏的技巧。此技能表示角色擅長安靜地移動（腳步輕盈）和/或精於偽裝。此外，這項技能還表示角色能夠保持一定程度的耐心和冷靜，來使自己長時間保持靜止，不被發現。' },
+  { id: 'disguise', name: '喬裝', category: 'technical', level: 'outsider', tooltip: '當你想讓自己看起來像是另一個人的時候，使用這項技能。技能使用者通過改變姿勢、服裝和/ 或聲音來偽裝成另一個人或另一類人。特效化妝和假身份證明會很有幫助。' },
+  { id: 'sleight-of-hand', name: '巧手', category: 'technical', level: 'outsider', tooltip: '此技能能夠利用雜物、布、其他遮蔽物或是使人產生錯覺的道具（如使用暗板或隔層），來對某件或某些物體進行視覺上的遮擋、藏匿或掩蓋。越大的物體就越難以隱藏。此外，妙手可用於盜竊、掌中藏牌和在暗中使用手機。' },
+  { id: 'locksmith', name: '鎖匠', category: 'technical', level: 'outsider', tooltip: '鎖匠可用於打開車門、短路點火（發動引擎）、撬開圖書館的窗戶、破解中國機關盒或越過普通的警報系統。技能使用者可以借助萬能鑰匙、開鎖器和其他工具來修復鎖具、配鑰匙或是開鎖。' },
+  { id: 'heavy-machinery', name: '操作重機', category: 'technical', level: 'outsider', tooltip: '用於駕駛與操作坦克、鏟斗機、蒸汽挖掘機或其他大型工程機械。' },
 
   // 生存 (Survival)
-  { id: 'survival', name: '生存', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['高原', '沙漠', '叢林', '高山', '極地'], specialtyPlaceholder: '生存環境' },
-  { id: 'climb', name: '攀爬', category: 'survival', level: 'novice' },
-  { id: 'jump', name: '跳躍', category: 'survival', level: 'amateur' },
-  { id: 'swim', name: '游泳', category: 'survival', level: 'amateur' },
-  { id: 'nature', name: '自然世界', category: 'survival', level: 'outsider' },
+  { id: 'survival', name: '生存', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['高原', '沙漠', '叢林', '高山', '極地'], specialtyPlaceholder: '生存環境', tooltip: '此技能提供在極端環境中生存所需的專業知識，如沙漠或極地環境，以及海洋或荒野地帶。取決於所處的環境，這項技能可以用於狩獵、搭建庇護所、識別環境危害（例如避開有毒植物）等。' },
+  { id: 'climb', name: '攀爬', category: 'survival', level: 'novice', tooltip: '此技能可使角色借助或不借助繩索與攀爬工具的情況下，攀登樹木、牆壁或其他垂直平面。同時還可用於繩索垂降。牆面的牢固程度、抓握處的多寡、風、能見度、雨等情況都會影響檢定難度。' },
+  { id: 'jump', name: '跳躍', category: 'survival', level: 'amateur', tooltip: '跳躍檢定可以使調查員垂直跳起或跳下，或者沿水平方向立定或助跑跳遠。墜落時，跳躍可以用來降低跌落所帶來的傷害。' },
+  { id: 'swim', name: '游泳', category: 'survival', level: 'amateur' },  
   { id: 'language', name: '語言', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['母語', '外語（自填）'], specialtyPlaceholder: '語言名稱' },
 
   // 知識 (Knowledge)
-  { id: 'history', name: '歷史', category: 'knowledge', level: 'outsider' },
-  { id: 'archaeology', name: '考古學', category: 'knowledge', level: 'outsider' },
-  { id: 'anthropology', name: '人類學', category: 'knowledge', level: 'outsider' },
-  { id: 'law', name: '法律', category: 'knowledge', level: 'outsider' },
-  { id: 'medicine', name: '醫藥', category: 'knowledge', level: 'outsider' },
-  { id: 'science', name: '科學', category: 'knowledge', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['天文學', '生物學', '植物學', '化學', '密碼學', '工程學', '司法科學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'] },
-  { id: 'occult', name: '神祕學', category: 'knowledge', level: 'outsider' },  
-  { id: 'accounting', name: '會計', category: 'knowledge', level: 'outsider' },  
+  { id: 'history', name: '歷史', category: 'knowledge', level: 'outsider', tooltip: '使調查員能夠回憶有關某個國家、城市、地區或個人的重要情報。成功的歷史檢定可以用於辨識先祖所熟悉但如今罕為人知的工具、技術或想法。' },
+  { id: 'nature', name: '博物學', category: 'knowledge', level: 'outsider', tooltip: '這項技能最初代表對自然環境中的動物及植物的研究。到十九世紀，這些研究分化為多種學科（生物學、植物學等）。作為一項技能，博物學代表來自農夫、漁民以及業餘研究者或愛好者們的傳統知識（而非科學）與個人觀察。它可以用於大略地辨識動植物的物種、習性和棲息地，識別動物或鳥類的蹤跡與叫聲，並能夠猜測對於特定物種而言何種行為最為重要。若要科學而系統地了解自然界，請參見生物學、植物學和動物學技能。博物學（帶來的線索）可能不甚精準——它是有關欣賞、辨別、民間傳統以及熱衷事物的領域。博物學可以用來辨別集市上的馬肉，或是判斷一件蝴蝶標本是品質出眾還是只有裝裱精美。' },
+  { id: 'archaeology', name: '考古學', category: 'knowledge', level: 'outsider', tooltip: '鑑別來自古代文明的文物並判斷其年代，同時辨別其真贗。還包含建立及勘探考古發掘場的專業知識。通過對發掘場的勘察，技能使用者可以推斷出遺址主人生前的狀態及生活方式。人類學對此可能會有所幫助。此外，考古學還有助於辨認失傳的人類語言的書面形式。' },
+  { id: 'anthropology', name: '人類學', category: 'knowledge', level: 'outsider', tooltip: '通過觀察來辨識並理解一個人的生活方式。如果一段時間內觀察另一種文化，或者研究某一已滅絕文化的準確記錄，那麼即使證據可能不完整，也可以對該文化的生活方式及狀態做出簡單的預測。研究某一文化一個月或更久，人類學家便能開始理解該文化如何運轉，結合心理學，就可以預測被研究者們的行為和信仰。' },
+  { id: 'law', name: '法律', category: 'knowledge', level: 'outsider', tooltip: '代表知曉相關法律、判例、法律辨術與法庭程序的可能性。作為一種職業，從事法律工作可以帶來大量回報和政治職位，但這往往需要連續數年的投入——高信用評級對此也很關鍵。\n在美國的某些州，律師執業須經過州律師公會許可。在異國使用這項技能會使難度等級提高，除非該角色花費數月時間研究該國法律制度。' },
+  { id: 'medicine', name: '醫藥', category: 'knowledge', level: 'outsider', tooltip: '診斷並處理事故、傷口、疾病、中毒等等，並能提出公共衛生建議。如果當前時代還未對某一疾病提出對應的治療方案，這項技能的效果將會十分有限、難以預估或是毫無結果。醫學技能使角色掌握各類藥物和藥劑的知識，無論其是天然的還是人工合成的，還包括對其副作用及禁忌症的了解。\n使用醫學技能進行治療需要花費至少一個小時的時間，並且可以在受到傷害後的任意時間進行，但如果沒有在受傷後一天內進行，那麼檢定的難度將會提高。急救者可以花費自己的恢復骰 + 1D3 來恢復傷者。在設施完備的當代醫院接受治療時，守秘人可以允許醫學檢定自動成功。' },
+  { id: 'science', name: '科學', category: 'knowledge', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['天文學', '生物學', '植物學', '化學', '密碼學', '工程學', '司法科學', '地質學', '數學', '氣象學', '藥學', '物理學', '動物學'], tooltip: '針對某一學科的理論與實踐能力，此技能通常都是通過正式的教育與訓練獲得，但也可能為學識淵博的業餘科學家擁有。對科學的理解與其範圍受到時代的限制。', specialtyTooltips: {
+    '天文學': '技能使用者知曉如何在特定的日期或時間找到天上的恆星和行星，了解日食和流星雨發生的時間，以及重要天體的名稱。這項技能還會提供目前已知的有關異星生命、星系的存在或形成的知識。學者能夠計算天體的運行軌道，論述恆星的生命週期，而在現代，還包含紅外天文學和基線干涉測量的相關知識。',
+    '生物學': '研究生命和生物體的學科，包括細胞學、生態學、遺傳學、組織學、微生物學及生理學等。使用這項技能可以針對某種可怖的神話病菌研製疫苗，從某種叢林植物中提取致幻成分，或是對血液和/ 或有機物進行分析。',
+    '植物學': '研究植物的學科，包括物種劃分、結構、生長、繁殖、化學性質、演化原理、疾病和顯微學。植物學的分支學科包括農學、林學、園藝學和古植物學。使用這項技能可以識別特定植物的特性（如是否有毒，能否食用或用於精神治療）及其特殊用途。',
+    '化學': '研究物質的構成，溫度、能量和壓力對其的影響，以及物質之間的相互反應。化學可以用於創造或提取複雜的化合物，包括簡單的炸藥、毒藥、氣體和酸，這需要適當的設備和化學品，並花費至少一天時間。在適當的設備和試劑的幫助下，技能使用者能夠分析未知物質。',
+    '密碼學': '研究暗碼和隱語的學科，由個人或多人為隱藏談話或信息的內容發展而來，屬於數學的分支學科。這項技能能夠用於識別、創造和/ 或破譯暗碼。暗碼通常以書面呈現，但也可能以其他形式出現，如將信息隱藏在樂曲、繪畫作品或是計算機代碼（在現代背景下）中。破譯暗碼是一項艱苦的工作，通常需要長時間的研究和運算。',
+    '工程學': '嚴格來講工程學並不算是一門科學，但為方便起見，將其歸類於此。科學通過觀察和記錄來發現某些現象，而工程學將這些發現投入實際應用，如機器、結構及材料。',
+    '司法科學': '對證據進行分析和鑑定的學科。通常與犯罪現場調查（檢查指紋、DNA、毛髮和體液）及實驗室工作有關，以此還原事實並為法律糾紛提供專業證人及證據。',
+    '地質學': '用於判斷岩層的大致年齡，識別化石的種類，區分礦物和晶體，確認可行的鑽井或採礦地點，評估土壤，預測火山活動、地震、雪崩及其他此類現象。',
+    '數學': '研究數字和邏輯的學科，包括數學理論、應用、理論解的設計與開發。這項技能可以用於識別非歐幾里德幾何，解開令人迷惑的公式，解密複雜的圖案或暗碼（有關暗碼的專業研究見密碼學）。',
+    '氣象學': '研究大氣的學科，包括天氣系統和氣候模式，以及大氣現象。使用這項技能可以判斷氣候模式，並預測雨、雪、霧等影響。',
+    '藥學': '研究化合物及其對生命體的影響的學科。傳統上，這項技能設計藥物的配方、製取和調配（無論是巫醫調配草藥還是現代藥劑師在實驗室中的操作）。這項技能能夠確保藥物被安全有效地使用，還能使技能使用者知曉藥物合成成分，鑑別毒素並了解可能出現的副作用。',
+    '物理學': '壓力、材料、運動、磁力、電、光、輻射及相關現象的理論知識，並使技能使用者有能力設計實驗來驗證這些理論。所能掌握的知識取決於時代。實用設備（如汽車）不屬於物理學範疇，但實驗設備可能屬於，並可能需要結合電氣維修或機械維修使用。',
+    '動物學': '專門研究動物界的生物學學科，包括動物的構造、演化、生物分類、行為習慣和分布，無論是現存的還是已滅絕的物種。使用這項技能可以通過動物留在環境中的痕跡（足跡、糞便、污痕等）來判斷動物的物種、可能的行為和領地特徵。'
+  } },
+  { id: 'occult', name: '神祕學', category: 'knowledge', level: 'outsider', tooltip: '技能使用者能夠辨識神秘學用具、詞彙與概念以及民俗傳統。還可用於辨認魔法書與神秘學記號。神秘學家熟知家族間代代相傳的神秘學知識，這些知識可能來自埃及和蘇美爾，中世紀和西方文藝復興時期，也可能來自亞洲和非洲。\n閱讀某些書籍可以使神秘學技能獲得提升。但這項技能無法用於克蘇魯神話中的法術、書籍以及魔法。' },  
+  { id: 'accounting', name: '會計', category: 'knowledge', level: 'outsider', tooltip: '理解會計工作流程，揭示企業或個人的財務運作情況。通過翻閱資料，可以發現企業是否欺騙員工，有無抽調資金，是否曾支付行賄或勒索款項，以及實際財務狀況是否與帳面不符。通過檢查會計帳簿，可以發現資金從何而來、去往何方（糧食運作、奴隸交易、威士忌經營等），以及這些款項向誰及為何支付。' },  
   
   ]
 }
@@ -953,7 +1014,11 @@ const normalizeSkills = (rawSkills) => {
     if (raw.specialtyOptions && Array.isArray(raw.specialtyOptions)) {
       target.specialtyOptions = raw.specialtyOptions
     }
+    if (raw.specialtyTooltips && typeof raw.specialtyTooltips === 'object') {
+      target.specialtyTooltips = raw.specialtyTooltips
+    }
     if (raw.note) target.note = raw.note
+    if (raw.tooltip !== undefined) target.tooltip = String(raw.tooltip || '').trim()
     if (raw.allowSpecialties !== undefined) target.allowSpecialties = raw.allowSpecialties
     if (raw.specialtyPlaceholder) target.specialtyPlaceholder = raw.specialtyPlaceholder
   })
@@ -1079,6 +1144,13 @@ const getAvailableSpecialtyOptions = (skill) => {
     : false
   return options.filter(option => !hasSpecialtyName(skill, option))
     .filter(option => !(option === '外語（自填）' && hasEmpty))
+}
+
+const getSpecialtyTooltip = (skill, specialtyName) => {
+  if (!skill || !specialtyName) return ''
+  const map = skill.specialtyTooltips
+  if (!map || typeof map !== 'object') return ''
+  return String(map[specialtyName] || '').trim()
 }
 
 const addSpecialtyFromOption = (skill, option) => {
@@ -1993,7 +2065,10 @@ const getTrackDisplayName = (value, type) => {
   font-weight: normal;
   border: 1px solid #6B4423;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
+  white-space: pre-line;
+  max-width: 360px;
+  width: max-content;
+  line-height: 1.45;
   font-family: 'Special Elite', 'Courier New', monospace;
   pointer-events: none;
 }
