@@ -343,7 +343,6 @@
                     </div>
                   </div>
                   <div class="text-xs text-gray-600 font-typewriter mb-4">
-                    <span class="mr-3">外行🤡：需花費額外1級努力</span>
                     <span>大師🎖️：可獲得免費1級努力</span>
                   </div>
                   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -793,7 +792,7 @@ const updateMaxSanity = () => {
 
 
 const skillLevelOptions = [
-  { value: 'outsider', label: '外行🤡', mod: '-1' },
+  { value: 'outsider', label: '外行', mod: '-2' },
   { value: 'novice', label: '新手', mod: '-1' },
   { value: 'amateur', label: '業餘', mod: '0' },
   { value: 'pro', label: '職業', mod: '+1' },
