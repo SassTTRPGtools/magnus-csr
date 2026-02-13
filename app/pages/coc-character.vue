@@ -875,7 +875,7 @@ function buildDefaultSkills () {
     '鞭': '用於流星索和長鞭。',
     '鞭子': '用於流星索和長鞭。'
   } },
-  { id: 'firearms', name: '火器', category: 'combat', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['弓', '手槍', '重武器', '火焰噴射器', '機關槍', '步槍/霰彈槍', '衝鋒槍'], specialtyTooltips: {
+  { id: 'firearms', name: '火器', category: 'combat', level: 'novice', allowSpecialties: true, specialties: [], specialtyOptions: ['弓', '手槍', '重武器', '火焰噴射器', '機關槍', '步槍/霰彈槍', '衝鋒槍'], specialtyTooltips: {
     '弓': '用於弓和弩，包括中世紀長弓到現代高性能複合弓。',
     '手槍': '用於所有手槍類武器，進行非連續性射擊。現代全自動手槍（MAC-11、UZI 微型衝鋒槍等）則使用衝鋒槍技能進行射擊。',
     '重武器': '用於榴彈發射器、反坦克火箭等。',
@@ -884,15 +884,15 @@ function buildDefaultSkills () {
     '步槍/霰彈槍': '用於所有類型的步槍（無論是槓桿式、栓式還是半自動步槍）及霰彈槍。由於霰彈槍的彈藥以散射方式擊發，使用者的命中目標的概率不會隨著射程增加而降低，但造成的傷害會因此減少。此外，以突擊步槍進行單發射擊（或多次單發射擊）時，使用該技能。',
     '衝鋒槍': '用於所有全自動手槍和衝鋒槍，也可用於全自動模式的突擊步槍。'
   } },
-  { id: 'dodge', name: '閃避', category: 'combat', level: 'outsider' },
+  { id: 'dodge', name: '閃避', category: 'combat', level: 'amateur' },
   { id: 'throwing', name: '投擲', category: 'combat', level: 'amateur' },
   { id: 'first-aid', name: '急救', category: 'combat', level: 'amateur', tooltip: '技能使用者能夠提供緊急醫療處理。這可能包括：用夾板固定斷肢、止血、處理燒傷、救助溺水者、清理及包紮傷口等。急救無法用於治療疾病（這需要使用醫學技能）。\n要使急救發揮作用，必須在受傷的一小時內使用這項技能，急救者可以花費自己的恢復骰來恢復傷者。兩名角色可以共同進行急救，只要其中任意一人的檢定成功即可。' },
 
   // 社交 (Social)
-  { id: 'charm', name: '取悅', category: 'social', level: 'outsider', tooltip: '取悅包含多種形式，包括以外貌吸引、誘惑、奉承或僅僅是依靠個人魅力。取悅技能可用於迫使對方以某種方式行動，但不可能使其做出完全與平日作風相反的行為。此技能與心理學技能對立。' },
-  { id: 'fast-talk', name: '話術', category: 'social', level: 'outsider', tooltip: '話術的範圍限於語言詭計、欺詐和誤導，例如哄騙保安使其允許你進入俱樂部、讓某人在一份他還未讀過的表單上簽字、讓警察去查看相反的方向等等。\n此技能與心理學對立。經過短暫的時間之後（通常是在話術使用者離開場景後），目標就會意識到他們受騙了。話術的效果總是十分短暫，但如果取得了更高的成功等級，這個效果便可以持續更長的時間。' },
-  { id: 'intimidate', name: '威脅', category: 'social', level: 'outsider', tooltip: '威脅有多種形式，包括武力震懾、心理操控和威脅。可用於驚嚇或強迫對方以某種方式行動。這項技能與心理學技能對立。使用武器或其他有利道具協助進行恐嚇可以使難度等級降低。' },
-  { id: 'persuade', name: '說服', category: 'social', level: 'outsider', tooltip: '通過合理的論證、論辯與討論使對方相信某一特定想法、概念或信念。說服的內容可能並非事實。成功的說服需要花費至少半個小時的時間。如果你想要迅速地勸服對方，則應當使用話術技能。此技能心理學技能對立。\n根據玩家所表達的內容，如果調查員在說服目標上花費了足夠多的時間，說服的效果可能會無限期的延續下去：可能會持續數年時間，直到發生事件或另一次說服轉變目標的想法。' },  
+  { id: 'charm', name: '取悅', category: 'social', level: 'novice', tooltip: '取悅包含多種形式，包括以外貌吸引、誘惑、奉承或僅僅是依靠個人魅力。取悅技能可用於迫使對方以某種方式行動，但不可能使其做出完全與平日作風相反的行為。此技能與心理學技能對立。' },
+  { id: 'fast-talk', name: '話術', category: 'social', level: 'amateur', tooltip: '話術的範圍限於語言詭計、欺詐和誤導，例如哄騙保安使其允許你進入俱樂部、讓某人在一份他還未讀過的表單上簽字、讓警察去查看相反的方向等等。\n此技能與心理學對立。經過短暫的時間之後（通常是在話術使用者離開場景後），目標就會意識到他們受騙了。話術的效果總是十分短暫，但如果取得了更高的成功等級，這個效果便可以持續更長的時間。' },
+  { id: 'intimidate', name: '威脅', category: 'social', level: 'novice', tooltip: '威脅有多種形式，包括武力震懾、心理操控和威脅。可用於驚嚇或強迫對方以某種方式行動。這項技能與心理學技能對立。使用武器或其他有利道具協助進行恐嚇可以使難度等級降低。' },
+  { id: 'persuade', name: '說服', category: 'social', level: 'novice', tooltip: '通過合理的論證、論辯與討論使對方相信某一特定想法、概念或信念。說服的內容可能並非事實。成功的說服需要花費至少半個小時的時間。如果你想要迅速地勸服對方，則應當使用話術技能。此技能心理學技能對立。\n根據玩家所表達的內容，如果調查員在說服目標上花費了足夠多的時間，說服的效果可能會無限期的延續下去：可能會持續數年時間，直到發生事件或另一次說服轉變目標的想法。' },  
   { id: 'art', name: '藝術／工藝', category: 'social', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['表演', '美術', '偽造文書', '攝影'], specialtyTooltips: {
     '表演': '表演者接受過戲劇和/或電影表演訓練（在現代，可能也會包括電視表演），能夠使其化身為一個角色，背誦劇本，還能依靠化妝來改變自己的樣貌。見喬裝。',
     '美術': '畫家擅長繪畫藝術（油畫、丙烯畫、水彩畫），以及用鉛筆、蠟筆或粉筆進行素描。嚴肅的作品可能需要數天乃至數月才能被創作出來，但畫家可以迅速將印象中的場景、物品和人物勾畫出來。這項技能還表示對藝術界的熟悉程度，讓畫家可以認出特定藝術家的作品、他們的學校以及這件作品的過去。',
@@ -905,8 +905,8 @@ function buildDefaultSkills () {
   { id: 'library', name: '圖書館使用', category: 'investigation', level: 'amateur', tooltip: '圖書館使用可以使調查員找到一段資訊，例如一份特定的書籍、報紙、圖書館中的參考文獻或是整理過的文件或資料庫，但前提是這條資訊確實可以被找到。此技能意味著需要進行數個小時的持續檢索。\n這項技能可以用於找到某本被封鎖的檔案或罕見的珍藏書籍，但要取得它們，可能需要用到說服、話術、取悅、恐嚇、信用評級或是特殊的資質文件。' },
   { id: 'listen', name: '聆聽', category: 'investigation', level: 'amateur', tooltip: '衡量調查員詮釋和理解聲音的能力，包括無意中聽見的對話、門後的輕聲交談與咖啡廳裡的低聲私語。' },
   { id: 'observe', name: '偵查', category: 'investigation', level: 'amateur', tooltip: '技能使用者能夠發現密門或隔間，注意到藏匿起來的闖入者，發現不明顯的線索，辨認重新噴漆的汽車，意識到伏擊者，注意到鼓起的口袋，以及各種類似的事物。這項技能對於調查員來說十分重要。如果角色只有極短的時機發現某些事物，如飛身而過的時候，守秘人可能會選擇提高難度。如果角色進行徹底的搜索，守秘人可以選擇使其檢定自動成功。所處的環境也可能影響檢定的難度——在雜亂的房間裡很難找到東西。' },
-  { id: 'navigate', name: '導航', category: 'investigation', level: 'outsider', tooltip: '無論是白天還是夜晚，暴風雨還是晴天，這項技能都能用於找到正確的方向。若遊戲的時代合適，擁有較高導航技能的角色將會熟悉星曆表、海圖、導航儀器和衛星定位設備。這項技能同樣可以用於測量並繪製一個區域（製圖學），無論這個區域是數平方公里的島嶼還是某個房間的內部。' },
-  { id: 'track', name: '追蹤', category: 'investigation', level: 'outsider', tooltip: '使用此技能，調查員能夠通過地面或植物上的痕跡來追蹤人、載具或動物。諸如痕跡遺留的時間、降雨和地面的類型等因素都可能會影響檢定的難度等級。' },
+  { id: 'navigate', name: '導航', category: 'investigation', level: 'novice', tooltip: '無論是白天還是夜晚，暴風雨還是晴天，這項技能都能用於找到正確的方向。若遊戲的時代合適，擁有較高導航技能的角色將會熟悉星曆表、海圖、導航儀器和衛星定位設備。這項技能同樣可以用於測量並繪製一個區域（製圖學），無論這個區域是數平方公里的島嶼還是某個房間的內部。' },
+  { id: 'track', name: '追蹤', category: 'investigation', level: 'novice', tooltip: '使用此技能，調查員能夠通過地面或植物上的痕跡來追蹤人、載具或動物。諸如痕跡遺留的時間、降雨和地面的類型等因素都可能會影響檢定的難度等級。' },
   { id: 'appraise', name: '鑑定', category: 'investigation', level: 'outsider', tooltip: '用於鑑定某一特定物品的價值、品質，及其使用的材料和工藝。如有需要，技能使用者能夠確認物品的時代，評估其歷史價值，並判斷其真贗。' },
   { id: 'psychology', name: '心理學', category: 'investigation', level: 'outsider', tooltip: '所有人都擁有的察言觀色的能力，技能使用者能夠觀察另一個人，從中判斷其動機和性格。守秘人可以選擇代替玩家暗中進行心理學技能檢定，只告知玩家使用該技能所獲取的資訊，而不告知這一資訊的真偽。' },
   { id: 'psychoanalysis', name: '精神分析', category: 'investigation', level: 'outsider', tooltip: '這項技能代表一系列心理療法，密集的精神分析可以使接受治療的調查員回復理智值。遊戲中每月一次，擲1D100，與精神分析師或醫生的精神分析技能相對比，以此確認治療進展。若檢定成功，患者回復1D3點理智值。若檢定失敗則不回復點數。若檢定大失敗，患者將失去1D6 點理智，且這位精神分析師的治療就此終結：治療過程中發生了嚴重的事故或戲劇性的挫折，導致醫師和患者間的關係破裂，無法挽救。\n在遊戲中，精神分析本身不能幫助角色從不定性瘋狂中恢復，這需要1D6個月的收容機構（或類似設施）護理，精神分析可能是其中的一部分。\n成功的使用這項技能可以讓角色暫時克服恐懼症的症狀，或是讓他們看穿幻覺。在遊戲中，這將允許一位陷入瘋狂的調查員在短時間內忽略恐懼症或躁狂症的影響，例如讓一位幽閉恐懼症患者在狹小的櫥櫃中躲藏十分鐘。同樣，角色可以進行精神分析檢定來幫助另一名陷入幻覺的調查員暫時看穿其幻覺。' },
@@ -915,17 +915,17 @@ function buildDefaultSkills () {
   { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['民用螺旋飛機', '熱氣球', '小艇', '輪船', '船舶'], specialtyPlaceholder: '駕駛類型', tooltip: '這項技能相當於水上或空中的汽車駕駛，用於操縱飛行或水上載具。任何一位在此技能上擁有適當能力的角色都可以在風平浪靜、能見度良好的情況下航行或飛行，但在暴風雨來臨、利用儀器導航、能見度低下或遭遇其他困境時，則需要進行檢定。惡劣天氣、低能見度和破損的載具都可能導致操縱飛行或水上載具的難度提高。' },
   { id: 'car', name: '汽車駕駛', category: 'technical', level: 'novice', tooltip: '任何具備此技能的人都能夠駕駛轎車或輕型卡車進行常規機動，並處理常見的載具問題。如果調查員想要甩掉追蹤者或追蹤某個人，那麼他可能需要進行一個汽車駕駛檢定。不同的文明可能會用相似的技能替代汽車駕駛：因紐特人可能會使用「雪橇駕駛」，維多利亞人則可能會使用「馬車駕駛」。' },
   { id: 'ride', name: '騎術', category: 'technical', level: 'outsider', tooltip: '此技能用於騎乘馴馬、驢或騾子，並包含有關坐騎的基本護理、騎乘用具以及馭使坐騎疾馳或越過困難地形的知識。' },
-  { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'outsider', tooltip: '使調查員能夠修理或重設電氣設備，如自動點火器、電動機、保險絲盒與防盜警報等。在現代，這項技能不會被用於電子產品。\n維修電氣設備可能需要特殊的零件或工具。在1920s，這類工作可能需要把電氣維修和機械維修結合使用。電氣維修也可以用於現代爆炸物（如雷管、C4 塑膠炸藥以及地雷）。這類武器的設計易於布置，只有大失敗才會' },
-  { id: 'mechanical-repair', name: '機械維修', category: 'technical', level: 'outsider', tooltip: '使調查員能夠修復一臺損壞的，或製作一臺新的機械裝置。同樣也可用於進行基礎的木工與管道工工作，以及構建（如滑輪系統）與修復（如蒸汽泵）物品。\n進行這些工作時可能需要特殊的工具或零件。此外，這項技能還可用於打開普通的家庭用鎖，但更為複雜的鎖需要鎖匠技能才能打開。機械維修常與電氣維修同時使用，維修汽車或飛機這類複雜設備時可能同時用到這兩項技能。' },
+  { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'novice', tooltip: '使調查員能夠修理或重設電氣設備，如自動點火器、電動機、保險絲盒與防盜警報等。在現代，這項技能不會被用於電子產品。\n維修電氣設備可能需要特殊的零件或工具。在1920s，這類工作可能需要把電氣維修和機械維修結合使用。電氣維修也可以用於現代爆炸物（如雷管、C4 塑膠炸藥以及地雷）。這類武器的設計易於布置，只有大失敗才會' },
+  { id: 'mechanical-repair', name: '機械維修', category: 'technical', level: 'novice', tooltip: '使調查員能夠修復一臺損壞的，或製作一臺新的機械裝置。同樣也可用於進行基礎的木工與管道工工作，以及構建（如滑輪系統）與修復（如蒸汽泵）物品。\n進行這些工作時可能需要特殊的工具或零件。此外，這項技能還可用於打開普通的家庭用鎖，但更為複雜的鎖需要鎖匠技能才能打開。機械維修常與電氣維修同時使用，維修汽車或飛機這類複雜設備時可能同時用到這兩項技能。' },
   { id: 'stealth', name: '潛匿', category: 'technical', level: 'amateur', tooltip: '在不被人聽到或看到的情況下，安靜地進行移動與躲藏的技巧。此技能表示角色擅長安靜地移動（腳步輕盈）和/或精於偽裝。此外，這項技能還表示角色能夠保持一定程度的耐心和冷靜，來使自己長時間保持靜止，不被發現。' },
   { id: 'disguise', name: '喬裝', category: 'technical', level: 'outsider', tooltip: '當你想讓自己看起來像是另一個人的時候，使用這項技能。技能使用者通過改變姿勢、服裝和/ 或聲音來偽裝成另一個人或另一類人。特效化妝和假身份證明會很有幫助。' },
-  { id: 'sleight-of-hand', name: '巧手', category: 'technical', level: 'outsider', tooltip: '此技能能夠利用雜物、布、其他遮蔽物或是使人產生錯覺的道具（如使用暗板或隔層），來對某件或某些物體進行視覺上的遮擋、藏匿或掩蓋。越大的物體就越難以隱藏。此外，妙手可用於盜竊、掌中藏牌和在暗中使用手機。' },
+  { id: 'sleight-of-hand', name: '巧手', category: 'technical', level: 'novice', tooltip: '此技能能夠利用雜物、布、其他遮蔽物或是使人產生錯覺的道具（如使用暗板或隔層），來對某件或某些物體進行視覺上的遮擋、藏匿或掩蓋。越大的物體就越難以隱藏。此外，妙手可用於盜竊、掌中藏牌和在暗中使用手機。' },
   { id: 'locksmith', name: '鎖匠', category: 'technical', level: 'outsider', tooltip: '鎖匠可用於打開車門、短路點火（發動引擎）、撬開圖書館的窗戶、破解中國機關盒或越過普通的警報系統。技能使用者可以借助萬能鑰匙、開鎖器和其他工具來修復鎖具、配鑰匙或是開鎖。' },
   { id: 'heavy-machinery', name: '操作重機', category: 'technical', level: 'outsider', tooltip: '用於駕駛與操作坦克、鏟斗機、蒸汽挖掘機或其他大型工程機械。' },
 
   // 生存 (Survival)
-  { id: 'survival', name: '生存', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['高原', '沙漠', '叢林', '高山', '極地'], specialtyPlaceholder: '生存環境', tooltip: '此技能提供在極端環境中生存所需的專業知識，如沙漠或極地環境，以及海洋或荒野地帶。取決於所處的環境，這項技能可以用於狩獵、搭建庇護所、識別環境危害（例如避開有毒植物）等。' },
-  { id: 'climb', name: '攀爬', category: 'survival', level: 'novice', tooltip: '此技能可使角色借助或不借助繩索與攀爬工具的情況下，攀登樹木、牆壁或其他垂直平面。同時還可用於繩索垂降。牆面的牢固程度、抓握處的多寡、風、能見度、雨等情況都會影響檢定難度。' },
+  { id: 'survival', name: '生存', category: 'survival', level: 'novice', allowSpecialties: true, specialties: [], specialtyOptions: ['高原', '沙漠', '叢林', '高山', '極地'], specialtyPlaceholder: '生存環境', tooltip: '此技能提供在極端環境中生存所需的專業知識，如沙漠或極地環境，以及海洋或荒野地帶。取決於所處的環境，這項技能可以用於狩獵、搭建庇護所、識別環境危害（例如避開有毒植物）等。' },
+  { id: 'climb', name: '攀爬', category: 'survival', level: 'amateur', tooltip: '此技能可使角色借助或不借助繩索與攀爬工具的情況下，攀登樹木、牆壁或其他垂直平面。同時還可用於繩索垂降。牆面的牢固程度、抓握處的多寡、風、能見度、雨等情況都會影響檢定難度。' },
   { id: 'jump', name: '跳躍', category: 'survival', level: 'amateur', tooltip: '跳躍檢定可以使調查員垂直跳起或跳下，或者沿水平方向立定或助跑跳遠。墜落時，跳躍可以用來降低跌落所帶來的傷害。' },
   { id: 'swim', name: '游泳', category: 'survival', level: 'amateur' },  
   { id: 'language', name: '語言', category: 'survival', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['母語', '外語（自填）'], specialtyPlaceholder: '語言名稱' },
