@@ -2058,17 +2058,17 @@ const getTrackDisplayName = (value, type) => {
   transform: translateX(-50%);
   background: #2C1810;
   color: #E8DCC8;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 4px;
   z-index: 9999;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: normal;
   border: 1px solid #6B4423;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   white-space: pre-line;
   max-width: 360px;
   width: max-content;
-  line-height: 1.45;
+  line-height: 1.6;
   font-family: 'Special Elite', 'Courier New', monospace;
   pointer-events: none;
 }
