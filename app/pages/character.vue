@@ -226,8 +226,8 @@
                         <div class="absolute inset-1 bg-red-800 rounded-full transform rotate-8" style="clip-path: polygon(25% 15%, 90% 30%, 95% 75%, 25% 90%, 10% 55%)"></div>
                         <!-- 中心白色方框 -->
                         <div class="absolute inset-3 bg-white border-2 border-black flex items-center justify-center">
-                          <input type="number" v-model.number="character.stressLevel" 
-                                 class="w-full text-center font-bold text-sm bg-transparent border-none focus:outline-none">
+                          <input type="number" v-model.number="character.stressLevel" readonly
+                                 class="w-full text-center font-bold text-sm bg-transparent border-none focus:outline-none cursor-not-allowed">
                         </div>
                         <!-- STRESS LEVEL 標籤 -->
                         <div class="absolute -top-1 -right-1 bg-red-900 text-white text-xs font-bold px-1 py-0.5 transform rotate-12 rounded text-center leading-tight">
@@ -605,6 +605,12 @@ const copyNotificationText = ref('')
 
 // 全域技能編輯狀態
 const allSkillsEditing = ref(false)
+
+// 監聽壓力值變化，自動計算壓力量級
+watch(() => character.value.currentStress, (newValue) => {
+  // 每3點壓力 = 1級量級，上限為4級
+  character.value.stressLevel = Math.min(Math.floor(newValue / 3), 4)
+}, { immediate: true })
 
 // 顯示複製成功提示
 const showCopySuccess = (text) => {
