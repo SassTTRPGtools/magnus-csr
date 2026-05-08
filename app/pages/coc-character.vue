@@ -204,7 +204,7 @@
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" v-model="character.advancementChecks.ability" class="mr-2">
-                      <span>新能力：從你的當前或更低階層中選擇一項基於類型的新能力。</span>
+                      <span>能力增強：你的屬性池獲得 4 個點數。這些點數能分配到任意屬性池。</span>
                     </label>
                     <label class="flex items-center">
                       <input type="checkbox" v-model="character.advancementChecks.recovery" class="mr-2">
@@ -1224,11 +1224,11 @@ const getCypherJsonPath = () => {
   // 但前端可用 window.location.pathname 判斷
   const isDev = process.dev || window.location.hostname === 'localhost'
   if (isDev) {
-    return '/data/cypher.json'
+    return '/data/coc-cypher.json'
   } else {
     // 取得 base 路徑（假設部署在 /magnus-csr）
     const base = window.location.pathname.split('/').filter(Boolean)[0] || ''
-    return `/${base}/data/cypher.json`
+    return `/${base}/data/coc-cypher.json`
   }
 }
 
