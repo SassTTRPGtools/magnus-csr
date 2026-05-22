@@ -237,6 +237,11 @@
                             class="px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100">
                       清空資料
                     </button>
+                    <!-- 第三行 -->
+                    <button @click="copyFVTTSkillsFormatted" 
+                            class="px-3 py-2 rounded border font-typewriter transition-colors text-blue-600 border-blue-300 bg-blue-50 hover:bg-blue-100 col-span-2">
+                      📋 FVTT技能排版
+                    </button>
                   </div>
                 </div>
               </div>
@@ -657,34 +662,30 @@
           <div class="border border-gray-300 rounded p-3 bg-gray-50">
             <div class="font-bold text-center mb-4 text-base">位階成長目標值</div>
             <div class="space-y-2">
-              <div class="flex justify-between">
-                <span class="font-bold">外行</span>
-                <span class="text-red-600 font-bold">≧ 12</span>
-              </div>
               <div class="bg-white h-px"></div>
               <div class="flex justify-between">
                 <span class="font-bold">新手</span>
-                <span class="text-orange-600 font-bold">≧ 14</span>
+                <span class="text-orange-600 font-bold">≧ 12</span>
               </div>
               <div class="bg-white h-px"></div>
               <div class="flex justify-between">
                 <span class="font-bold">業餘</span>
-                <span class="text-gray-600 font-bold">≧ 16</span>
+                <span class="text-gray-600 font-bold">≧ 14</span>
               </div>
               <div class="bg-white h-px"></div>
               <div class="flex justify-between">
                 <span class="font-bold">職業</span>
-                <span class="text-green-600 font-bold">≧ 18</span>
+                <span class="text-green-600 font-bold">≧ 16</span>
               </div>
               <div class="bg-white h-px"></div>
               <div class="flex justify-between">
                 <span class="font-bold">專家</span>
-                <span class="text-blue-600 font-bold">≧ 19</span>
+                <span class="text-blue-600 font-bold">≧ 18</span>
               </div>
               <div class="bg-white h-px"></div>
               <div class="flex justify-between">
                 <span class="font-bold">大師</span>
-                <span class="text-purple-600 font-bold">= 20</span>
+                <span class="text-purple-600 font-bold">≧ 19</span>
               </div>
             </div>
           </div>
@@ -1776,6 +1777,73 @@ const copyStatusToClipboard = async () => {
     try {
       document.execCommand('copy')
       showCopySuccess('狀態值已複製到剪貼簿！')
+    } catch (fallbackError) {
+      showCopySuccess('複製失敗，請重試')
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+// FVTT 技能排版
+const copyFVTTSkillsFormatted = async () => {
+  // 定義技能等級的順序和顯示格式
+  const skillLevelConfig = [
+    { value: 'outsider', number: '1', label: '外行', mod: '-2', note: '' },
+    { value: 'novice', number: '2', label: '新手', mod: '-1', note: '' },
+    { value: 'amateur', number: '3', label: '業餘', mod: '0', note: '' },
+    { value: 'pro', number: '4', label: '職業', mod: '+1', note: '' },
+    { value: 'expert', number: '5', label: '專家', mod: '+2', note: '' },
+    { value: 'master', number: '6', label: '大師', mod: '+2', note: ' (免費努力)' }
+  ]
+
+  // 收集所有技能（包括主技能和特技）
+  const skillsByLevel = {}
+  skillLevelConfig.forEach(config => {
+    skillsByLevel[config.value] = []
+  })
+
+  // 遍歷所有技能
+  character.value.skills.forEach(skill => {
+    if (!skill || !skill.name) return
+
+    // 添加主技能
+    if (skillsByLevel[skill.level] !== undefined) {
+      skillsByLevel[skill.level].push(skill.name)
+    }
+
+    // 添加特技
+    if (Array.isArray(skill.specialties) && skill.specialties.length > 0) {
+      skill.specialties.forEach(spec => {
+        if (spec && spec.name) {
+          if (skillsByLevel[spec.level] !== undefined) {
+            skillsByLevel[spec.level].push(spec.name)
+          }
+        }
+      })
+    }
+  })
+
+  // 構建輸出文本
+  let fvttText = ''
+  skillLevelConfig.forEach(config => {
+    const skills = skillsByLevel[config.value]
+    const skillList = skills.length > 0 ? skills.join('、') : '(無)'
+    fvttText += `${config.number} ${config.label} ${config.mod}${config.note}：${skillList}\n`
+  })
+
+  try {
+    await navigator.clipboard.writeText(fvttText)
+    showCopySuccess('FVTT技能排版已複製到剪貼簿！')
+  } catch (error) {
+    console.error('複製失敗:', error)
+    // 備用方案：創建臨時文字區域
+    const textArea = document.createElement('textarea')
+    textArea.value = fvttText
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      showCopySuccess('FVTT技能排版已複製到剪貼簿！')
     } catch (fallbackError) {
       showCopySuccess('複製失敗，請重試')
     }
