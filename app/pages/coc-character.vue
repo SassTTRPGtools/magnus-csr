@@ -913,7 +913,7 @@ function buildDefaultSkills () {
   { id: 'psychoanalysis', name: '精神分析', category: 'investigation', level: 'outsider', tooltip: '這項技能代表一系列心理療法，密集的精神分析可以使接受治療的調查員回復理智值。遊戲中每月一次，擲1D100，與精神分析師或醫生的精神分析技能相對比，以此確認治療進展。若檢定成功，患者回復1D3點理智值。若檢定失敗則不回復點數。若檢定大失敗，患者將失去1D6 點理智，且這位精神分析師的治療就此終結：治療過程中發生了嚴重的事故或戲劇性的挫折，導致醫師和患者間的關係破裂，無法挽救。\n在遊戲中，精神分析本身不能幫助角色從不定性瘋狂中恢復，這需要1D6個月的收容機構（或類似設施）護理，精神分析可能是其中的一部分。\n成功的使用這項技能可以讓角色暫時克服恐懼症的症狀，或是讓他們看穿幻覺。在遊戲中，這將允許一位陷入瘋狂的調查員在短時間內忽略恐懼症或躁狂症的影響，例如讓一位幽閉恐懼症患者在狹小的櫥櫃中躲藏十分鐘。同樣，角色可以進行精神分析檢定來幫助另一名陷入幻覺的調查員暫時看穿其幻覺。' },
 
   // 技術 (Technical)
-  { id: 'drive', name: '駕駛', category: 'technical', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['民用螺旋飛機', '熱氣球', '小艇', '輪船', '船舶'], specialtyPlaceholder: '駕駛類型', tooltip: '這項技能相當於水上或空中的汽車駕駛，用於操縱飛行或水上載具。任何一位在此技能上擁有適當能力的角色都可以在風平浪靜、能見度良好的情況下航行或飛行，但在暴風雨來臨、利用儀器導航、能見度低下或遭遇其他困境時，則需要進行檢定。惡劣天氣、低能見度和破損的載具都可能導致操縱飛行或水上載具的難度提高。' },
+  { id: 'drive', name: '特殊載具', category: 'technical', level: 'outsider', allowSpecialties: true, specialties: [], specialtyOptions: ['民用螺旋飛機', '熱氣球', '小艇', '輪船', '船舶'], specialtyPlaceholder: '特殊載具類型', tooltip: '這項技能相當於水上或空中的汽車駕駛，用於操縱飛行或水上載具。任何一位在此技能上擁有適當能力的角色都可以在風平浪靜、能見度良好的情況下航行或飛行，但在暴風雨來臨、利用儀器導航、能見度低下或遭遇其他困境時，則需要進行檢定。惡劣天氣、低能見度和破損的載具都可能導致操縱飛行或水上載具的難度提高。' },
   { id: 'car', name: '汽車駕駛', category: 'technical', level: 'novice', tooltip: '任何具備此技能的人都能夠駕駛轎車或輕型卡車進行常規機動，並處理常見的載具問題。如果調查員想要甩掉追蹤者或追蹤某個人，那麼他可能需要進行一個汽車駕駛檢定。不同的文明可能會用相似的技能替代汽車駕駛：因紐特人可能會使用「雪橇駕駛」，維多利亞人則可能會使用「馬車駕駛」。' },
   { id: 'ride', name: '騎術', category: 'technical', level: 'outsider', tooltip: '此技能用於騎乘馴馬、驢或騾子，並包含有關坐騎的基本護理、騎乘用具以及馭使坐騎疾馳或越過困難地形的知識。' },
   { id: 'electrical-repair', name: '電器維修', category: 'technical', level: 'novice', tooltip: '使調查員能夠修理或重設電氣設備，如自動點火器、電動機、保險絲盒與防盜警報等。在現代，這項技能不會被用於電子產品。\n維修電氣設備可能需要特殊的零件或工具。在1920s，這類工作可能需要把電氣維修和機械維修結合使用。電氣維修也可以用於現代爆炸物（如雷管、C4 塑膠炸藥以及地雷）。這類武器的設計易於布置，只有大失敗才會' },
@@ -1796,7 +1796,7 @@ const copyFVTTSkillsFormatted = async () => {
     { value: 'master', number: '6', label: '大師', mod: '+2', note: ' (免費努力)' }
   ]
 
-  // 收集所有技能（包括主技能和特技）
+  // 收集所有技能項目（包括主技能和特技）
   const skillsByLevel = {}
   skillLevelConfig.forEach(config => {
     skillsByLevel[config.value] = []
@@ -1806,28 +1806,31 @@ const copyFVTTSkillsFormatted = async () => {
   character.value.skills.forEach(skill => {
     if (!skill || !skill.name) return
 
-    // 添加主技能
-    if (skillsByLevel[skill.level] !== undefined) {
-      skillsByLevel[skill.level].push(skill.name)
-    }
+    const skillName = skill.name
 
-    // 添加特技
+    // 如果有細項，為每個細項添加 "技能名 [細項]" 格式
     if (Array.isArray(skill.specialties) && skill.specialties.length > 0) {
       skill.specialties.forEach(spec => {
         if (spec && spec.name) {
+          const itemText = `${skillName} [${spec.name}]`
           if (skillsByLevel[spec.level] !== undefined) {
-            skillsByLevel[spec.level].push(spec.name)
+            skillsByLevel[spec.level].push(itemText)
           }
         }
       })
+    } else {
+      // 沒有細項，直接添加主技能
+      if (skillsByLevel[skill.level] !== undefined) {
+        skillsByLevel[skill.level].push(skillName)
+      }
     }
   })
 
   // 構建輸出文本
   let fvttText = ''
   skillLevelConfig.forEach(config => {
-    const skills = skillsByLevel[config.value]
-    const skillList = skills.length > 0 ? skills.join('、') : '(無)'
+    const items = skillsByLevel[config.value]
+    const skillList = items.length > 0 ? items.join('、') : '(無)'
     fvttText += `${config.number} ${config.label} ${config.mod}${config.note}：${skillList}\n`
   })
 
